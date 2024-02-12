@@ -8,8 +8,8 @@ export default class CreditsPage implements m.ClassComponent {
           'data-target': 'menu',
         }),
         m('h1..scoreboard__header__title.header-block', [
-          m('em', 'Robots-JU'),
-          ' FLL Scoreboard',
+          m('em', 'FLL Gameday'),
+          ' Calculator',
         ]),
       ]),
       m('.textpage', [

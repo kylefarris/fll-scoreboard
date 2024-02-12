@@ -52,6 +52,9 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
     // If we compared with the current location hash, it would try updating the hash when we're navigating away from the page to a page that doesn't have a hash
     if (missionsJson !== this.lastMissions) {
       const missionHash = this.hashReader.encode(this.missions);
+
+      console.log('The Missions:', this.missions);
+
       const initialMissionHash = this.hashReader.encode(scorer.initialMissionsState());
 
       if (missionHash === initialMissionHash) {

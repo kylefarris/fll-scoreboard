@@ -44,6 +44,7 @@ m.route.prefix = '';
 const routes = {
   '/': createResolver({
     oninit() {
+      console.log('Initialize!');
       // Redirect to the first year automatically
       m.route.set('/' + years[0].data.meta.slug);
     },

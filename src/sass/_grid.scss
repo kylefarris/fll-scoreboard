@@ -1,9 +1,13 @@
 .scoreboard__grid {
-  margin: 60px auto 180px;
+  margin: 110px auto 65px;
   max-width: 800px;
 
   &.--overlay-open {
     margin-left: 0;
+  }
+
+  @media (max-width: 635px) {
+    margin: 110px auto 108px;
   }
 
   @media (min-width: 1800px) {

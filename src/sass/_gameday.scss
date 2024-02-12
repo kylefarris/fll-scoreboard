@@ -1,0 +1,48 @@
+.gameday-form {
+    margin-top: 25px;
+    border-top: 4px solid rgb(16 39 88);
+    background: #3576ff;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+
+    form.commit-tabulation {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: end;
+        gap: 15px;
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+
+            label {
+                font-size: 0.85em;
+            }
+
+            input, select {
+                min-width: 185px;
+                height: 35px;
+            }
+        }
+
+        button {
+            flex: 1;
+            height: 35px;
+            color: white;
+            background: #102758;
+            border: 1px solid black;
+            border-radius: 5px;
+            min-width: 185px;
+
+            &:hover {
+                background-color: red;
+            }
+        }
+    }
+}

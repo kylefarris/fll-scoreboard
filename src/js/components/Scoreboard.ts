@@ -2,7 +2,7 @@ import * as m from 'mithril';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
 import OverlayMission from './OverlayMission';
-import TopViewField from './TopViewField';
+// import TopViewField from './TopViewField';
 import Configuration from '../utils/Configuration';
 import {texts} from '../global';
 import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
@@ -81,8 +81,8 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         }),
         m('.header-block.score', 'Score: ' + score),
         m('h1..scoreboard__header__title.header-block', [
-          m('em', 'Robots-JU'),
-          ' FLL Scoreboard',
+          m('em', 'FLL Gameday'),
+          ' Calculator',
         ]),
         m('.overlay-nav', {
           className: this.focused_mission !== -1 ? ' active' : '',
@@ -135,14 +135,10 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           }, trans(warning_data).replace('%warning%', warning));
         }
       )),
-      this.gridMode ? m(GridBoard, {
+      m(GridBoard, {
         data,
         missions,
-        focused_mission: this.focused_mission,
-        focusMission: this.focusMission.bind(this),
-      }) : m(TopViewField, {
-        data,
-        missions,
+        score,
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
       }),
@@ -168,21 +164,6 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           icon('eraser'),
           ' ',
           trans(texts.strings.reset),
-        ]),
-        m('button.btn', {
-          onclick: () => {
-            this.gridMode = !this.gridMode;
-            this.focused_mission = -1;
-            window.localStorage.setItem('gridMode', this.gridMode ? '1' : '0');
-          },
-        }, this.gridMode ? [
-          icon('map'),
-          ' ',
-          trans(texts.strings.map_mode),
-        ] : [
-          icon('list'),
-          ' ',
-          trans(texts.strings.grid_mode),
         ]),
       ]),
     ]);
