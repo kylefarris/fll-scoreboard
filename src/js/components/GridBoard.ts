@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import OverlayOptionBoolean from './OverlayOptionBoolean';
 import OverlayOptionNumber from './OverlayOptionNumber';
-import {MissionObject, Year} from '../interfaces/ChallengeYear';
+import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import CommitForm from './CommitForm';
 import trans from '../helpers/trans';
 
@@ -10,12 +10,13 @@ interface GridBoardAttrs {
   score: number,
   missions: MissionObject
   focused_mission: number
+  scorer: AbstractScorer<MissionObject, any>
   focusMission: (mission: number) => void
 }
 
 export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
   view(vnode: m.Vnode<GridBoardAttrs>) {
-    const {data, missions, focused_mission, score, focusMission} = vnode.attrs;
+    const {data, missions, focused_mission, score, scorer, focusMission} = vnode.attrs;
 
     return m('.scoreboard__grid', {
       className: focused_mission !== -1 ? ' --overlay-open' : '',
@@ -46,7 +47,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
         mission.constraints ? m('.constraints', m('ul.browser-default', mission.constraints.map(constraint => m('li', trans(constraint))))) : null,
       ];
     }),
-    m(CommitForm, { score, missions }),
+    m(CommitForm, { score, missions, scorer }),
     );
   }
 }

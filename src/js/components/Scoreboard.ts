@@ -139,6 +139,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         data,
         missions,
         score,
+        scorer,
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
       }),

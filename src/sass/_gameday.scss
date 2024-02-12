@@ -28,6 +28,7 @@
             input, select {
                 min-width: 185px;
                 height: 35px;
+                padding-left: 15px;
             }
         }
 
@@ -41,7 +42,21 @@
             min-width: 185px;
 
             &:hover {
-                background-color: red;
+                background-color: #003dbd;
+                border: 1px solid #7da7ff;
+                cursor: pointer;
+            }
+        }
+
+        button[disabled=disabled],
+        button:disabled {
+            background-color: #cacaca;
+            color: rgb(164 164 164);
+            border: 1px solid rgb(161 161 161);
+            opacity: 0.5;
+
+            &:hover {
+                cursor: not-allowed;
             }
         }
     }

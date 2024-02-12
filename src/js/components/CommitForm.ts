@@ -1,10 +1,12 @@
 import * as m from 'mithril';
 import { MissionObject } from '../interfaces/ChallengeYear';
 import Tabulation from '../models/Tabulation';
+import { AbstractScorer } from '../interfaces/ChallengeYear';
 
 interface CommitFormAttrs {
   missions: MissionObject
   score: number,
+  scorer: AbstractScorer<MissionObject, any>,
 }
 
 export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
@@ -13,7 +15,9 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
     Tabulation.commitForm.score = score;
     Tabulation.commitForm.missions = missions;
   }
-  view() {
+  view(vnode: m.Vnode<CommitFormAttrs, this>) {
+    const { scorer, missions } = vnode.attrs;
+
     return m(
       '.gameday-form',
       [
@@ -22,13 +26,30 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
           'form.commit-tabulation',
           {
             async onsubmit(e) {
-                e.preventDefault();
-                await Tabulation.commit();
+              e.preventDefault();
+              try {
+                const result = await Tabulation.commit();
+                if (result === true) {
+                  const initial = scorer.initialMissionsState();
+                  Object.keys(initial).forEach(key => {
+                    missions[key] = initial[key];
+                  });
+
+                  M.toast({
+                    html: 'Score Received!',
+                    classes: 'green text-white',
+                  });
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              } catch (err) {
+                M.toast({
+                    html: err,
+                    classes: 'red text-white',
+                  });
+              }
             },
           },
           [
-            m('input[type=hidden]', { type: 'hidden', name: 'score', value: Tabulation.commitForm.score }),
-            m('input[type=hidden]', { type: 'hidden', name:'missions', value: Tabulation.commitForm.missions }),
             m('.field-group', [
               m('label', 'Your Referee Code'),
               m('input', {
@@ -36,8 +57,9 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 name: 'refCode',
                 class: 'input-field',
                 async onblur(e) {
+                  // console.log('Supposed to be doing stuff.', e.target.value, Tabulation.commitForm.refCode);
                   if (Tabulation.commitForm.refCode === e.target.value || !e.target.value?.length) return;
-                  Tabulation.commitForm.refCode = e.target.value;
+                  Tabulation.commitForm.refCode = e.target.value.toUpperCase();
                   await Tabulation.getRefInfo();
                 },
                 value: Tabulation.commitForm.refCode,
@@ -47,29 +69,35 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               m('label', 'Team Scored'),
               m('select', {
                 name: 'teamId',
+                disabled: !Tabulation.refInfo?.eventId,
                 oninput(e) {
                   Tabulation.commitForm.teamId = e.target.value;
+                  Tabulation.getMatches();
                 },
                 value: Tabulation.commitForm.teamId,
               }, Tabulation.teams.map(v => {
-                return m('option', { value: v.id }, `${v.id} - ${v.name}`)
+                return m('option', { value: v.id }, v.id ? `${v.id} - ${v.name}` : '')
               })),
             ]),
             m('.field-group', [
               m('label', 'Match Scored'),
               m('select', {
                 name: 'matchId',
+                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId,
                 oninput(e) {
-                  Tabulation.commitForm.teamId = e.target.value;
+                  Tabulation.commitForm.matchId = e.target.value;
                 },
-                value: Tabulation.commitForm.teamId,
+                value: Tabulation.commitForm.matchId,
               }, Tabulation.matches.map(v => {
                 return m('option', { value: v.id }, v.name)
               })),
             ]),
             m(
               'button',
-              { type: 'submit' },
+              {
+                type: 'submit',
+                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId || !Tabulation.commitForm.matchId
+              },
               'Submit Score'
             )
           ]
