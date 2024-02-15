@@ -34,7 +34,7 @@ const data: Year = {
   },
   missions: [
     {
-      number: 0,
+      number: null,
       title: {
         en: 'Equipment Inspection',
         fr: 'Inspection de l\'équipement',
@@ -727,7 +727,7 @@ const data: Year = {
       ],
     },
     {
-      number: 16,
+      number: 'GP',
       title: {
         en: 'Gracious Professionalism®',
         fr: 'Gracious Professionalism',

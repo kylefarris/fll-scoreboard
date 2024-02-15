@@ -18,7 +18,7 @@ export interface Year {
 }
 
 export interface Mission {
-  number: number
+  number: number|string
   title: TranslatedText
   description?: TranslatedText
   position: Position

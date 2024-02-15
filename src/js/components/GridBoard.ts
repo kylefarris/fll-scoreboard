@@ -27,7 +27,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
             onclick() {
               focusMission(missionIndex);
             },
-          }, mission.number === null ? 'PE' : 'M' + ('0' + mission.number).slice(-2)),
+          }, mission.number === null ? 'PM' : (mission.number === 'GP' ? 'GP' : 'M' + ('0' + mission.number).slice(-2))),
           m('.title', trans(mission.title)),
           mission.description ? m('.description', trans(mission.description)) : null,
         ]),
