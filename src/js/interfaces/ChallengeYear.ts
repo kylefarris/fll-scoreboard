@@ -47,6 +47,7 @@ export interface Option {
   points?: number
   points_list?: number[]
   variable_points?: boolean
+  labels?: string[]
   colors_list?: (
     'dark-blue' |
     'dark-green' |
@@ -61,6 +62,7 @@ export interface Option {
     'yellow'
     )[]
   max?: number
+  min?: number
   images: string[]
 }
 

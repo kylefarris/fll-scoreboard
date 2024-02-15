@@ -14,8 +14,9 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
     const {option, missions, controlOnly} = vnode.attrs;
 
     let inputs = [];
+    const min = option.min ? option.min : 0;
 
-    for (let number = 0; number <= option.max; number++) {
+    for (let number = min; number <= option.max; number++) {
       let pointsForThisOption = null;
 
       if (option.points) {
@@ -74,19 +75,37 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
         }
       }
 
+      let label = '';
+      
+      if (option.labels) {
+        if (number === 0) {
+          label = '-';
+        } else if (indexForThisNumbersPointsOrLabel < option.labels.length) {
+          label = option.labels[indexForThisNumbersPointsOrLabel];
+        }
+      }
+
       inputs.push(m('.number.waves-effect', {
         className: missions[option.handle] === number ? ' active' : '',
         onclick() {
           missions[option.handle] = number;
         },
       }, [
-        option.colors_list ? m('.color-disc', color ? {
-          style: {
-            backgroundColor: color,
-          },
-        } : {
-          className: 'no-color',
-        }) : m('.digit', number),
+        option.colors_list ?
+          m(
+            '.color-disc',
+            color ? {
+              style: {
+                backgroundColor: color,
+              },
+            } : {
+              className: 'no-color',
+            }
+          )
+          :
+          option.labels ?
+            m('.label', label) :
+            m('.digit', number),
         pointsForThisOption !== null ? m('.points', (pointsForThisOption > 0 ? '+' : '') + pointsForThisOption) : null,
       ]));
     }

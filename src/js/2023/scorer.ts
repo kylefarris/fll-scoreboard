@@ -40,6 +40,7 @@ interface MissionObject2023 extends MissionObject {
   m14_destinations?: number
   m15_experts?: number
   m16_precision_tokens?: number
+  m17_gracious_professionalism?: number
 }
 
 export class FllScorer extends AbstractScorer<MissionObject2023, Warnings2023> {
@@ -71,6 +72,7 @@ export class FllScorer extends AbstractScorer<MissionObject2023, Warnings2023> {
       m14_destinations: 0,
       m15_experts: 0,
       m16_precision_tokens: 6,
+      m17_gracious_professionalism: 3,
     };
   }
 

@@ -53,8 +53,6 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
     if (missionsJson !== this.lastMissions) {
       const missionHash = this.hashReader.encode(this.missions);
 
-      console.log('The Missions:', this.missions);
-
       const initialMissionHash = this.hashReader.encode(scorer.initialMissionsState());
 
       if (missionHash === initialMissionHash) {
