@@ -80,8 +80,6 @@ export default class Tabulation {
             });
 
             if (result && result?.success === true && result?.results?.newTabulationResult?.inserted === 1 && result?.results?.scoreUpdateResult?.replaced === 1) {
-                // @todo show some kind of success
-                
                 // Reset the commit form
                 this.commitForm.refCode = '';
                 this.commitForm.teamId = null;
@@ -89,6 +87,8 @@ export default class Tabulation {
 
                 return true;
             }
+
+            return false;
         } catch (err) {
             // @todo Show some errors
             return false;

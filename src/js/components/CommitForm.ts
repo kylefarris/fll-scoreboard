@@ -9,6 +9,16 @@ interface CommitFormAttrs {
   scorer: AbstractScorer<MissionObject, any>,
 }
 
+// const uuidRgx = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
+const matchKeys = ['match1', 'match2', 'match3', 'practice'];
+
+function fail(msg) {
+  M.toast({
+    html: msg,
+    classes: 'red text-white',
+  });
+}
+
 export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
   oninit(vnode: m.Vnode<CommitFormAttrs, this>) {
     const { score, missions } = vnode.attrs;
@@ -16,7 +26,11 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
     Tabulation.commitForm.missions = missions;
   }
   view(vnode: m.Vnode<CommitFormAttrs, this>) {
-    const { scorer, missions } = vnode.attrs;
+    const { scorer, missions, score } = vnode.attrs;
+
+    // Update missions and score into model each time they change
+    Tabulation.commitForm.score = score;
+    Tabulation.commitForm.missions = missions;
 
     return m(
       '.gameday-form',
@@ -27,6 +41,17 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
           {
             async onsubmit(e) {
               e.preventDefault();
+
+              // Verify that all required fields are provided
+              if (Tabulation.commitForm.score === null) return fail('No score to send!');
+              if (Object.keys(Tabulation.commitForm.missions).length === 0) return fail('No missions have been scored!');
+              if (!Tabulation.commitForm.refCode || !/^[A-Z0-9]{6}$/.test(Tabulation.commitForm.refCode)) return fail('Invalid Referee Code provided!');
+              if (!Tabulation.commitForm.teamId || !/^\d{5}$/.test(Tabulation.commitForm?.teamId?.toString())) return fail('No/Invalid "Team Scored" selected!');
+              if (!Tabulation.commitForm.matchId || !matchKeys.includes(Tabulation.commitForm.matchId)) return fail('No/Invalid "Match Scored" value.');
+
+              // console.log('Tabulation Data: ', Tabulation.commitForm);
+              // return;
+
               try {
                 const result = await Tabulation.commit();
                 if (result === true) {
@@ -53,7 +78,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
             m('.field-group', [
               m('label', 'Your Referee Code'),
               m('input', {
-                type: 'password',
+                type: 'text',
                 name: 'refCode',
                 class: 'input-field',
                 async onblur(e) {

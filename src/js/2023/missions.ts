@@ -729,7 +729,7 @@ const data: Year = {
     {
       number: 16,
       title: {
-        en: 'Gracious Professionalism',
+        en: 'Gracious Professionalism®',
         fr: 'Gracious Professionalism',
       },
       position: {
@@ -742,7 +742,7 @@ const data: Year = {
             {
               title: {
                 en: 'Gracious Professionalism® displayed at the robot game table',
-                fr: 'Curseurs de la table de mixage en position haute',
+                fr: 'Gracious Professionalism® displayed at the robot game table',
               },
               handle: 'm17_gracious_professionalism',
               type: 'number',
