@@ -137,7 +137,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 disabled: !Tabulation.commitForm.scoreApproved,
                 class: `input-field${Tabulation.refError !== null ? ' invalid' : ''}`,
                 async oninput(e) {
-                  // Tabulation.commitForm.refCode = e.target.value.toUpperCase();
+                  Tabulation.commitForm.refCode = e.target.value.toUpperCase();
 
                   if (e.target.value.length === 6) {
                     await Tabulation.getRefInfo();
@@ -151,7 +151,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                     Tabulation.resetRef();
                   }
                 },
-                value: Tabulation.commitForm.refCode,
+                // value: Tabulation.commitForm.refCode,
               }),
             ]),
             m('.field-group', [
