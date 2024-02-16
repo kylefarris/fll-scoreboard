@@ -137,9 +137,9 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 disabled: !Tabulation.commitForm.scoreApproved,
                 class: `input-field${Tabulation.refError !== null ? ' invalid' : ''}`,
                 async oninput(e) {
-                  Tabulation.commitForm.refCode = e.target.value.toUpperCase();
+                  // Tabulation.commitForm.refCode = e.target.value.toUpperCase();
 
-                  if (Tabulation.commitForm.refCode.length === 6) {
+                  if (e.target.value.length === 6) {
                     await Tabulation.getRefInfo();
                     setTimeout(() => {
                       if (Tabulation.refError !== null) {

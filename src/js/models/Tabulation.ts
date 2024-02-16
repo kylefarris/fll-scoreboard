@@ -121,13 +121,13 @@ export default class Tabulation {
     }
 
     static async getRefInfo() {
-        if (!/^[A-Z0-9]{6}$/.test(Tabulation.commitForm.refCode)) return;
+        if (!/^[A-Z0-9]{6}$/i.test(Tabulation.commitForm.refCode)) return;
 
         try {
             const result: RefInfo = await m.request({
                 method: 'POST',
                 url: `${apiBaseUrl}/login`,
-                body: { refCode: Tabulation.commitForm.refCode },
+                body: { refCode: Tabulation.commitForm.refCode.toUpperCase() },
             });
 
             if (result?.eventId) {
