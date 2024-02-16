@@ -1,3 +1,93 @@
+small.error-info {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: red;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.3rem;
+    font-size:0.9rem;
+}
+form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        label {
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+
+        input, select {
+            min-width: 185px;
+            height: 50px;
+            padding-left: 15px;
+            font-size: 1.1rem;
+
+            &.invalid {
+                border: 2px solid red;
+            }
+        }
+    }
+
+    button {
+        flex: 1;
+        height: 50px;
+        color: white;
+        background: #102758;
+        border: 1px solid black;
+        border-radius: 5px;
+        min-width: 185px;
+        font-size: 1.2rem;
+        margin-top: 15px;
+
+        &:hover {
+            background-color: #003dbd;
+            border: 1px solid #7da7ff;
+            cursor: pointer;
+        }
+    }
+
+    button[disabled=disabled],
+    button:disabled {
+        background-color: #cacaca;
+        color: rgb(164 164 164);
+        border: 1px solid rgb(161 161 161);
+        opacity: 0.5;
+
+        &:hover {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.team-signature-form {
+    margin-top: 25px;
+    border-top: 4px solid rgb(3 60 27);
+    background: #007633;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+
+    button {
+        background: #0a3f15;
+        border: 1px solid #052709;
+
+        &:hover {
+            background-color: #46b858;
+            border: 1px solid #9bd99a;
+        }
+    }
+}
+
 .gameday-form {
     margin-top: 25px;
     border-top: 4px solid rgb(16 39 88);
@@ -8,56 +98,13 @@
     display: flex;
     flex-direction: column;
 
-    form.commit-tabulation {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: end;
-        gap: 15px;
+    button {
+        background: #102758;
+        border: 1px solid black;
 
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-
-            label {
-                font-size: 0.85em;
-            }
-
-            input, select {
-                min-width: 185px;
-                height: 35px;
-                padding-left: 15px;
-            }
-        }
-
-        button {
-            flex: 1;
-            height: 35px;
-            color: white;
-            background: #102758;
-            border: 1px solid black;
-            border-radius: 5px;
-            min-width: 185px;
-
-            &:hover {
-                background-color: #003dbd;
-                border: 1px solid #7da7ff;
-                cursor: pointer;
-            }
-        }
-
-        button[disabled=disabled],
-        button:disabled {
-            background-color: #cacaca;
-            color: rgb(164 164 164);
-            border: 1px solid rgb(161 161 161);
-            opacity: 0.5;
-
-            &:hover {
-                cursor: not-allowed;
-            }
+        &:hover {
+            background-color: #003dbd;
+            border: 1px solid #7da7ff;
         }
     }
 }

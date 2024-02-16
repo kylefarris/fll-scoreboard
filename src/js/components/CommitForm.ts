@@ -32,9 +32,65 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
     Tabulation.commitForm.score = score;
     Tabulation.commitForm.missions = missions;
 
-    return m(
-      '.gameday-form',
+    return m('div', [
+      m('.team-signature-form', [
+        m('h3', 'Team Zone'),
+        m('p', 'Please verify the results. Once you are satisfied, type your team number and your intials into the fields below and press "Approve Score".'),
+        m('p', 'Once you approve the results, you cannot change your mind!'),
+        m(
+          'form',
+          {
+            onsubmit(e) {
+              e.preventDefault();
+              Tabulation.commitForm.scoreApproved = true;
+            },
+          },
+          [
+            m('.field-group', [
+              m('label', 'Your Team Number'),
+              m('input', {
+                type: 'number',
+                name: 'teamNumber',
+                class: 'input-field',
+                max: 99999,
+                async oninput(e) {
+                  Tabulation.commitForm.teamNumber = parseInt(e.target.value, 10);
+
+                  // Re-check matching codes if team code is changed after approving
+                  if (Tabulation.commitForm.refCode && Tabulation.commitForm.teamId) {
+                    Tabulation.validateTeamNumber();
+                  }
+                },
+                value: Tabulation.commitForm.teamNumber,
+              }),
+            ]),
+            m('.field-group', [
+              m('label', 'Your Initials'),
+              m('input', {
+                type: 'text',
+                name: 'teamMemberInitials',
+                class: 'input-field',
+                maxlength: 3,
+                oninput(e) {
+                  Tabulation.commitForm.teamMemberInitials = e.target.value;
+                },
+                value: Tabulation.commitForm.teamMemberInitials,
+              }),
+            ]),
+            m(
+              'button',
+              {
+                type: 'submit',
+                disabled: !Tabulation.commitForm.teamNumber || Tabulation.commitForm.teamMemberInitials.length < 2 || Tabulation.commitForm.scoreApproved
+              },
+              'Approve Score'
+            )
+          ]
+        )
+      ]),
+      m('.gameday-form',
       [
+        m('h3', 'Referee Zone'),
         m('p', 'Once the team has verified the score with you, please provide the necessary information to officially submit this score the FLL Gameday system.'),
         m(
           'form.commit-tabulation',
@@ -48,9 +104,6 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               if (!Tabulation.commitForm.refCode || !/^[A-Z0-9]{6}$/.test(Tabulation.commitForm.refCode)) return fail('Invalid Referee Code provided!');
               if (!Tabulation.commitForm.teamId || !/^\d{5}$/.test(Tabulation.commitForm?.teamId?.toString())) return fail('No/Invalid "Team Scored" selected!');
               if (!Tabulation.commitForm.matchId || !matchKeys.includes(Tabulation.commitForm.matchId)) return fail('No/Invalid "Match Scored" value.');
-
-              // console.log('Tabulation Data: ', Tabulation.commitForm);
-              // return;
 
               try {
                 const result = await Tabulation.commit();
@@ -80,24 +133,42 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               m('input', {
                 type: 'text',
                 name: 'refCode',
-                class: 'input-field',
-                async onblur(e) {
-                  // console.log('Supposed to be doing stuff.', e.target.value, Tabulation.commitForm.refCode);
-                  if (Tabulation.commitForm.refCode === e.target.value || !e.target.value?.length) return;
+                maxlength: 6,
+                disabled: !Tabulation.commitForm.scoreApproved,
+                class: `input-field${Tabulation.refError !== null ? ' invalid' : ''}`,
+                async oninput(e) {
                   Tabulation.commitForm.refCode = e.target.value.toUpperCase();
-                  await Tabulation.getRefInfo();
+
+                  if (Tabulation.commitForm.refCode.length === 6) {
+                    await Tabulation.getRefInfo();
+                    setTimeout(() => {
+                      if (Tabulation.refError !== null) {
+                        fail(Tabulation.refError.toString());
+                        Tabulation.resetRef(Tabulation.refError);
+                      }
+                    }, 0);
+                  } else {
+                    Tabulation.resetRef();
+                  }
                 },
                 value: Tabulation.commitForm.refCode,
               }),
             ]),
             m('.field-group', [
               m('label', 'Team Scored'),
+              Tabulation.teamError ? m('small.error-info', Tabulation.teamError) : undefined,
               m('select', {
                 name: 'teamId',
-                disabled: !Tabulation.refInfo?.eventId,
+                disabled: !Tabulation.refInfo?.eventId || Tabulation.commitForm.refCode.length !== 6,
+                class: Tabulation.validTeamNumber === false ? 'invalid' : '',
                 oninput(e) {
                   Tabulation.commitForm.teamId = e.target.value;
-                  Tabulation.getMatches();
+                  Tabulation.validateTeamNumber();
+                  if (Tabulation.validTeamNumber) {
+                    Tabulation.getMatches();
+                  } else {
+                    fail(Tabulation.teamError);
+                  }
                 },
                 value: Tabulation.commitForm.teamId,
               }, Tabulation.teams.map(v => {
@@ -127,7 +198,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
             )
           ]
         ),
-      ]
-    )
+      ])
+    ])
   }
 }

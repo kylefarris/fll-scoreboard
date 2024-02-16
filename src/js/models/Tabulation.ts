@@ -45,6 +45,17 @@ export interface CommitResult {
     results: any,
 }
 
+export interface CommitForm {
+    teamNumber: Number,
+    teamMemberInitials: string,
+    scoreApproved: Boolean,
+    refCode: string,
+    teamId: string,
+    matchId: string,
+    score: Number,
+    missions: Object,
+}
+
 const runNameMapping = {
     match1: 'Match 1',
     match2: 'Match 2',
@@ -62,14 +73,19 @@ export default class Tabulation {
         volunteer: null,
     };
     static teams: Array<TeamList> = [];
-    static commitForm = {
+    static commitForm: CommitForm = {
+        teamNumber: null,
+        teamMemberInitials: '',
+        scoreApproved: false,
         refCode: '',
         teamId: null,
         matchId: null,
         score: null,
         missions: {},
     };
-    static refError: Error = null;
+    static refError: String = null;
+    static teamError: String = null;
+    static validTeamNumber: Boolean = null;
 
     static async commit() {
         try {
@@ -84,6 +100,8 @@ export default class Tabulation {
                 this.commitForm.refCode = '';
                 this.commitForm.teamId = null;
                 this.commitForm.matchId = null;
+                this.commitForm.teamNumber = null;
+                this.commitForm.teamMemberInitials = '';
 
                 return true;
             }
@@ -113,9 +131,27 @@ export default class Tabulation {
                     .map(v => ({ id: v.id, name: v.name }));
                 
                 Tabulation.teams.unshift({ id: 0, name: '' });
+                
+                // Pre-choose team based on the code provided by the team (should be possible)
+                if (Tabulation.teams.some(v => v.id == Tabulation.commitForm.teamNumber)) {
+                    console.log('Pre-selecting team: ', Tabulation.commitForm.teamNumber);
+                    setTimeout(() => Tabulation.commitForm.teamId = Tabulation.commitForm.teamNumber.toString(), 0);
+                } else {
+                    console.log(
+                        'Come on man...',
+                        Tabulation.teams.map(v => v.id),
+                        Tabulation.commitForm.teamNumber,
+                        Tabulation.teams.some(v => v.id === Tabulation.commitForm.teamNumber),
+                        Tabulation.teams.some(v => v.id == Tabulation.commitForm.teamNumber)
+                    );
+                }
+            } else {
+                console.error('No ref: ', result);
             }
         }  catch (err) {
-            Tabulation.refError = err;
+            console.error('Ref ERror:', err.code, err.response);
+            Tabulation.refError = err.response.err;
+            Tabulation.resetRef(err.response.err);
         }
     }
 
@@ -127,7 +163,7 @@ export default class Tabulation {
 
         if (!Tabulation.commitForm.teamId) return []
 
-        const team = Tabulation.refInfo.event.teams.find(v => v.id == Tabulation.commitForm.teamId);
+        const team = Tabulation.refInfo.event.teams.find(v => v.id.toString() === Tabulation.commitForm.teamId);
         if (!team?.id) {
             console.error('No team found!', Tabulation.commitForm);
             return [];
@@ -139,5 +175,24 @@ export default class Tabulation {
             .map(v => ({ id: v, name: runNameMapping[v] }));
 
         Tabulation.commitForm.matchId = Tabulation.matches[0].id;
+    }
+
+    static resetRef(err = null) {
+        Tabulation.refInfo.id = null;
+        Tabulation.refInfo.eventId = null;
+        Tabulation.refInfo.volunteerId = null;
+        Tabulation.refInfo.event = null;
+        Tabulation.refInfo.volunteer = null;
+        Tabulation.refError = err;
+    }
+
+    static validateTeamNumber() {
+        if (Tabulation.commitForm.teamId === Tabulation.commitForm.teamNumber.toString()) {
+            Tabulation.validTeamNumber = true;
+            Tabulation.teamError = null;
+        } else {
+            Tabulation.validTeamNumber = false;
+            Tabulation.teamError = 'Warning: Team-provided number and selected team do not match!';
+        }
     }
 }

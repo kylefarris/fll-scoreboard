@@ -110,7 +110,7 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
       ]));
     }
 
-    const inputsGroup = m('.numbers-input' + (inputs.length > 4 ? '.numbers-input-many' : ''), inputs);
+    const inputsGroup = m('.numbers-input' + (inputs.length > 4 || /gracious/i.test(option.handle) ? '.numbers-input-many' : ''), inputs);
 
     if (controlOnly) {
       return m('.scoreboard__option', inputsGroup);
