@@ -7,6 +7,7 @@ import Configuration from '../utils/Configuration';
 import {texts} from '../global';
 import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import GridBoard from './GridBoard';
+import Tabulation from '../models/Tabulation';
 
 export interface ScoreboardAttrs {
   missions: MissionObject
@@ -161,6 +162,8 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
               Object.keys(initial).forEach(key => {
                 missions[key] = initial[key];
               });
+
+              Tabulation.resetCommitForm();
             }
           },
         }, [

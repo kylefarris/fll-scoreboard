@@ -97,11 +97,7 @@ export default class Tabulation {
 
             if (result && result?.success === true && result?.results?.newTabulationResult?.inserted === 1 && result?.results?.scoreUpdateResult?.replaced === 1) {
                 // Reset the commit form
-                this.commitForm.refCode = '';
-                this.commitForm.teamId = null;
-                this.commitForm.matchId = null;
-                this.commitForm.teamNumber = null;
-                this.commitForm.teamMemberInitials = '';
+                Tabulation.resetCommitForm();
 
                 return true;
             }
@@ -111,6 +107,17 @@ export default class Tabulation {
             // @todo Show some errors
             return false;
         }
+    }
+
+    static resetCommitForm() {
+        Tabulation.commitForm.teamNumber = null;
+        Tabulation.commitForm.teamMemberInitials = '';
+        Tabulation.commitForm.scoreApproved = false;
+        Tabulation.commitForm.refCode = '';
+        Tabulation.commitForm.teamId = null;
+        Tabulation.commitForm.matchId = null;
+        Tabulation.commitForm.teamNumber = null;
+        Tabulation.commitForm.teamMemberInitials = '';
     }
 
     static async getRefInfo() {
