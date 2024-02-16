@@ -129,6 +129,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
           },
           [
             m('.field-group', [
+              Tabulation.refError ? m('small.error-info', Tabulation.refError) : undefined,
               m('label', 'Your Referee Code'),
               m('input', {
                 type: 'text',
@@ -136,7 +137,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 maxlength: 6,
                 disabled: !Tabulation.commitForm.scoreApproved,
                 class: `input-field${Tabulation.refError !== null ? ' invalid' : ''}`,
-                async oninput(e) {
+                async onblur(e) {
                   Tabulation.commitForm.refCode = e.target.value.toUpperCase();
 
                   if (e.target.value.length === 6) {
