@@ -156,10 +156,12 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
       m('.tools', [
         m('button.btn.btn-larger', {
           onclick() {
-            const initial = scorer.initialMissionsState();
-            Object.keys(initial).forEach(key => {
-              missions[key] = initial[key];
-            });
+            if (confirm('Are you sure you want to start over??')) {
+              const initial = scorer.initialMissionsState();
+              Object.keys(initial).forEach(key => {
+                missions[key] = initial[key];
+              });
+            }
           },
         }, [
           icon('eraser'),
