@@ -2,8 +2,9 @@ import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
+import Tabulation from '../models/Tabulation';
 import {texts} from '../global';
-import {MissionObject, Option, Task} from '../interfaces/ChallengeYear';
+import type {MissionObject, Option, Task} from '../interfaces/ChallengeYear';
 
 interface OverlayOptionBooleanAttrs {
   task: Task
@@ -20,8 +21,12 @@ export default class OverlayOptionBoolean implements m.ClassComponent<OverlayOpt
       m('input[type=checkbox]', {
         checked: missions[option.handle],
         onchange() {
+          // Prevent if the scoring is locked by a ref
+          if (Tabulation.commitForm.scoreLocked) return false;
+
           // We need to edit all the other options of that task,
           // switch the state of this option and disable all the others
+          // biome-ignore lint/complexity/noForEach: <explanation>
           task.options.forEach(check_option => {
             if (check_option.handle === option.handle) {
               missions[check_option.handle] = !missions[option.handle];
@@ -40,7 +45,7 @@ export default class OverlayOptionBoolean implements m.ClassComponent<OverlayOpt
         m('.description', [
           m('span.fake-checkbox', icon('check')),
           m('span.title', trans(controlOnly ? texts.strings.yes : option.title)),
-          option.points ? m('span.points', '+' + option.points) :null,
+          option.points ? m('span.points', `+${option.points}`) :null,
           option.variable_points ? m('span.points', icon('asterisk')):null,
         ]),
       ]),

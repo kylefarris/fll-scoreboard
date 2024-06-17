@@ -44,9 +44,8 @@ m.route.prefix = '';
 const routes = {
   '/': createResolver({
     oninit() {
-      console.log('Initialize!');
       // Redirect to the first year automatically
-      m.route.set('/' + years[0].data.meta.slug);
+      m.route.set(`/${years[0].data.meta.slug}`);
     },
     view() {
       return null;
@@ -55,8 +54,9 @@ const routes = {
   '/credits': createResolver(CreditsPage),
 };
 
+// biome-ignore lint/complexity/noForEach: <explanation>
 years.forEach(year => {
-  routes['/' + year.data.meta.slug] = createResolver(StandaloneScoreboard, {
+  routes[`/${year.data.meta.slug}`] = createResolver(StandaloneScoreboard, {
     key: year.data.meta.slug, // Prevent Mithril re-using a scoreboard and its scorer/hasher
     ...year,
   });

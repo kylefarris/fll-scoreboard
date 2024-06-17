@@ -1,17 +1,17 @@
-import {AbstractScorer, MissionObject} from '../interfaces/ChallengeYear';
+import {AbstractScorer, type MissionObject} from '../interfaces/ChallengeYear';
 import {booleanMission, numericMission} from '../helpers/missionStateRead';
 
 enum Warnings2023 {
-  m02_invalid_color,
-  m02_bonus_requirement_not_met,
-  m04_bonus_requirement_not_met,
-  m08_invalid_pointer,
-  m10_max_three_sliders,
-  m11_invalid_zone,
-  m12_bonus_requirement_not_met,
-  m14_max_seven_members,
-  m14_max_seven_destinations,
-  m15_max_five_experts,
+  m02_invalid_color = 0,
+  m02_bonus_requirement_not_met = 1,
+  m04_bonus_requirement_not_met = 2,
+  m08_invalid_pointer = 3,
+  m10_max_three_sliders = 4,
+  m11_invalid_zone = 5,
+  m12_bonus_requirement_not_met = 6,
+  m14_max_seven_members = 7,
+  m14_max_seven_destinations = 8,
+  m15_max_five_experts = 9,
 }
 
 interface MissionObject2023 extends MissionObject {
@@ -78,7 +78,7 @@ export class FllScorer extends AbstractScorer<MissionObject2023, Warnings2023> {
 
   public computeMissions(missions: MissionObject2023) {
     let score = 0;
-    let warnings = [];
+    const warnings = [];
 
     /*
      |

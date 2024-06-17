@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import OverlayOptionBoolean from './OverlayOptionBoolean';
 import OverlayOptionNumber from './OverlayOptionNumber';
-import {MissionObject, Task} from '../interfaces/ChallengeYear';
+import type {MissionObject, Task} from '../interfaces/ChallengeYear';
 
 interface OverlayTaskAttrs {
   task: Task
@@ -32,7 +32,7 @@ export default class OverlayTask implements m.ClassComponent<OverlayTaskAttrs> {
             });
         }
 
-        console.warn('Invalid option type ' + option.type);
+        console.warn(`Invalid option type ${option.type}`);
         return 'INVALID OPTION TYPE';
       }
     ));

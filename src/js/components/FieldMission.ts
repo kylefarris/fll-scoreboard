@@ -17,8 +17,10 @@ export default class FieldMission implements m.ClassComponent<FieldMissionAttrs>
     let scoring = false;
     let score = 0;
 
+    // biome-ignore lint/complexity/noForEach: <explanation>
     mission.tasks.forEach(
       task => {
+        // biome-ignore lint/complexity/noForEach: <explanation>
         task.options.forEach(
           option => {
             switch (option.type) {
@@ -45,7 +47,7 @@ export default class FieldMission implements m.ClassComponent<FieldMissionAttrs>
                 }
                 break;
               default:
-                console.warn('Unknown option type ' + option.type);
+                console.warn(`Unknown option type ${option.type}`);
             }
           }
         );
@@ -57,15 +59,15 @@ export default class FieldMission implements m.ClassComponent<FieldMissionAttrs>
         vnode.attrs.focusMission(vnode.attrs.key);
       },
       style: {
-        top: mission.position.top + '%',
-        left: mission.position.left + '%',
+        top: `${mission.position.top}%`,
+        left: `${mission.position.left}%`,
       },
     }, [
       m('.pointer', {
         className: (scoring ? ' scoring' : '') + (score < 0 ? ' negative' : ''),
       }, [
         m('.score', score !== 0 ? score : (scoring ? m('i.fas.fa-check') : '')),
-        m('.number', mission.number === null ? 'PE' : ('M' + mission.number)),
+        m('.number', mission.number === null ? 'PE' : (`M${mission.number}`)),
       ]),
       m('.label', trans(mission.title)),
     ]);

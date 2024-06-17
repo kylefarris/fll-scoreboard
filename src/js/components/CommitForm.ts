@@ -1,11 +1,12 @@
 import * as m from 'mithril';
-import { MissionObject } from '../interfaces/ChallengeYear';
+import type { MissionObject } from '../interfaces/ChallengeYear';
 import Tabulation from '../models/Tabulation';
-import { AbstractScorer } from '../interfaces/ChallengeYear';
+import type { AbstractScorer } from '../interfaces/ChallengeYear';
 
 interface CommitFormAttrs {
   missions: MissionObject
   score: number,
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   scorer: AbstractScorer<MissionObject, any>,
 }
 
@@ -33,7 +34,43 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
     Tabulation.commitForm.missions = missions;
 
     return m('div', [
-      m('.team-signature-form', [
+      m('.form-lock', [
+        m('p', 'Before handing the calculator over to the team to verify their score, you will need to lock the scores. Your referee code will be required to unlock it.'),
+        m(
+          'button.lock-btn',
+          {
+            async onclick(e) {
+              if (Tabulation.commitForm.scoreLocked === false) {
+                Tabulation.commitForm.scoreLocked = true;
+              } else {
+                const refCode = prompt('Provide your referee code to unlock scoring:');
+
+                if (refCode.trim().length === 6) {
+                  Tabulation.commitForm.refCode = refCode.toUpperCase().trim();
+
+                  await Tabulation.getRefInfo();
+                  setTimeout(() => {
+                    if (Tabulation.refError === null) {
+                      Tabulation.commitForm.scoreLocked = false;
+                    } else {
+                      fail(Tabulation.refError.toString());
+                      Tabulation.resetRef(Tabulation.refError);
+                    }
+                  }, 0);
+                } else {
+                  fail('Invalid ref code provided!');
+                  Tabulation.resetRef();
+                }
+              }
+            }
+          },
+          [
+            m('i', { ariaHidden: 'true', class: 'fa fa-lock' }),
+            ` ${Tabulation.commitForm.scoreLocked ? 'Unl' : 'L'}ock Scores`
+          ]
+        )
+      ]),
+      m('.team-signature-form', { style: `display: ${Tabulation.commitForm.scoreLocked || Tabulation.commitForm.scoreApproved ? 'block' : 'none'};` }, [
         m('h3', 'Team Zone'),
         m('p', 'Please verify the results. Once you are satisfied, type your team number and your intials into the fields below and press "Approve Score".'),
         m('p', 'Once you approve the results, you cannot change your mind!'),
@@ -54,7 +91,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 class: 'input-field',
                 max: 99999,
                 async oninput(e) {
-                  Tabulation.commitForm.teamNumber = parseInt(e.target.value, 10);
+                  Tabulation.commitForm.teamNumber = Number.parseInt(e.target.value, 10);
 
                   // Re-check matching codes if team code is changed after approving
                   if (Tabulation.commitForm.refCode && Tabulation.commitForm.teamId) {
@@ -71,8 +108,13 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                 name: 'teamMemberInitials',
                 class: 'input-field',
                 maxlength: 3,
+                readonly: Tabulation.commitForm.scoreApproved,
                 oninput(e) {
-                  Tabulation.commitForm.teamMemberInitials = e.target.value;
+
+                  Tabulation.commitForm.teamMemberInitials = e.target.value.replace(/[^A-Z]/gi, '').toUpperCase();
+                },
+                onblur(e) {
+                  Tabulation.commitForm.teamMemberInitials = e.target.value.toUpperCase();
                 },
                 value: Tabulation.commitForm.teamMemberInitials,
               }),
@@ -88,7 +130,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
           ]
         )
       ]),
-      m('.gameday-form',
+      m('.gameday-form', { style: `display: ${Tabulation.commitForm.scoreApproved ? 'block' : 'none'};` },
       [
         m('h3', 'Referee Zone'),
         m('p', 'Once the team has verified the score with you, please provide the necessary information to officially submit this score the FLL Gameday system.'),
@@ -102,23 +144,26 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               if (Tabulation.commitForm.score === null) return fail('No score to send!');
               if (Object.keys(Tabulation.commitForm.missions).length === 0) return fail('No missions have been scored!');
               if (!Tabulation.commitForm.refCode || !/^[A-Z0-9]{6}$/.test(Tabulation.commitForm.refCode)) return fail('Invalid Referee Code provided!');
-              if (!Tabulation.commitForm.teamId || !/^\d{5}$/.test(Tabulation.commitForm?.teamId?.toString())) return fail('No/Invalid "Team Scored" selected!');
+              if (!Tabulation.commitForm.teamId || !/^\d{1,5}$/.test(Tabulation.commitForm?.teamId?.toString())) return fail('No/Invalid "Team Scored" selected!');
               if (!Tabulation.commitForm.matchId || !matchKeys.includes(Tabulation.commitForm.matchId)) return fail('No/Invalid "Match Scored" value.');
 
               try {
                 const result = await Tabulation.commit();
                 if (result === true) {
                   const initial = scorer.initialMissionsState();
+                  // biome-ignore lint/complexity/noForEach: <explanation>
                   Object.keys(initial).forEach(key => {
                     missions[key] = initial[key];
                   });
 
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
                   M.toast({
                     html: 'Score Received!',
                     classes: 'green text-white',
                   });
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
+
+                if (result instanceof Error) throw result;
               } catch (err) {
                 M.toast({
                     html: err,
@@ -152,7 +197,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                     Tabulation.resetRef();
                   }
                 },
-                // value: Tabulation.commitForm.refCode,
+                value: Tabulation.commitForm.refCode,
               }),
             ]),
             m('.field-group', [

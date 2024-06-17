@@ -5,7 +5,7 @@ import OverlayMission from './OverlayMission';
 // import TopViewField from './TopViewField';
 import Configuration from '../utils/Configuration';
 import {texts} from '../global';
-import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
+import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import GridBoard from './GridBoard';
 import Tabulation from '../models/Tabulation';
 
@@ -18,7 +18,7 @@ export interface ScoreboardAttrs {
 export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
   focused_mission = -1
   missionsCount: number
-  gridMode: boolean = false
+  gridMode = false
 
   oninit(vnode: m.Vnode<ScoreboardAttrs>) {
     // Need to copy this value because it will be used in a callback without access to vnode
@@ -53,7 +53,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         newIndex = -1;
         break;
       default:
-        newIndex = typeof mission === 'string' ? parseInt(mission) : mission;
+        newIndex = typeof mission === 'string' ? Number.parseInt(mission) : mission;
     }
 
     this.focused_mission = newIndex;
@@ -78,9 +78,9 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         }),
         m('img.logo', {
           src: Configuration.imagePath + data.meta.logo,
-          alt: data.meta.title + ' season logo',
+          alt: `${data.meta.title} season logo`,
         }),
-        m('.header-block.score', 'Score: ' + score),
+        m('.header-block.score', `Score: ${score}`),
         m('h1..scoreboard__header__title.header-block', [
           m('em', 'FLL Gameday'),
           ' Calculator',
@@ -117,7 +117,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
 
           let warning_data = null;
 
-          if (warning_key && data.warnings.hasOwnProperty(warning_key)) {
+          if (warning_key && (warning_key in data.warnings)) {
             warning_data = data.warnings[warning_key];
           } else {
             warning_data = texts.strings.unknown_warning;
@@ -159,6 +159,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           onclick() {
             if (confirm('Are you sure you want to start over??')) {
               const initial = scorer.initialMissionsState();
+              // biome-ignore lint/complexity/noForEach: <explanation>
               Object.keys(initial).forEach(key => {
                 missions[key] = initial[key];
               });
