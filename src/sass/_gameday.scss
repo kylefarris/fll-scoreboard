@@ -67,6 +67,38 @@ form {
     }
 }
 
+.form-lock {
+    margin-top: 25px;
+    border-top: 4px solid rgb(27, 27, 27);
+    background: #585858;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    button.lock-btn {
+        height: 50px;
+        color: white;
+        background: #2c2c2c;
+        border: 1px solid #858585;
+        border-radius: 5px;
+        min-width: 185px;
+        font-size: 1.2rem;
+        margin-top: 15px;
+
+        &:hover {
+            background-color: rgb(210, 210, 210);
+            border: 1px solid #101010;
+            color: black;
+            cursor: pointer;
+        }
+    }
+}
+
 .team-signature-form {
     margin-top: 25px;
     border-top: 4px solid rgb(3 60 27);

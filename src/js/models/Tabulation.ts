@@ -3,57 +3,61 @@ import * as m from 'mithril';
 const apiBaseUrl = 'https://api.fllgameday.org/tabulation';
 
 export interface Runs {
-    match1: Number,
-    match2: Number,
-    match3: Number,
-    practice: Number,
+    match1: number,
+    match2: number,
+    match3: number,
+    practice: number,
 }
 
 export interface Team {
-    id: Number,
-    name: String,
+    id: number,
+    name: string,
     runs: Runs,
 }
 
 export interface RefEvent {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
     teams: Array<Team>,
 }
 
 export interface Referee {
-    id: String,
-    name: String,
-    role: String,
+    id: string,
+    name: string,
+    role: string,
 }
 
 export interface RefInfo {
-    id: String,
-    eventId: String,
-    volunteerId: String,
+    id: string,
+    eventId: string,
+    volunteerId: string,
     event: RefEvent,
     volunteer: Referee
 }
 
 export interface TeamList {
-    id: Number,
-    name: String,
+    id: number,
+    name: string,
 }
 
 export interface CommitResult {
-    success: Boolean,
+    success: boolean,
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     results: any,
+    error: string,
 }
 
 export interface CommitForm {
-    teamNumber: Number,
+    teamNumber: number,
     teamMemberInitials: string,
-    scoreApproved: Boolean,
+    scoreApproved: boolean,
     refCode: string,
     teamId: string,
     matchId: string,
-    score: Number,
+    score: number,
+    // biome-ignore lint/complexity/noBannedTypes: <explanation>
     missions: Object,
+    scoreLocked: boolean,
 }
 
 const runNameMapping = {
@@ -63,6 +67,7 @@ const runNameMapping = {
     practice: 'Practice',
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export default class Tabulation {
     static matches = [];
     static refInfo: RefInfo = {
@@ -82,10 +87,11 @@ export default class Tabulation {
         matchId: null,
         score: null,
         missions: {},
+        scoreLocked: false,
     };
-    static refError: String = null;
-    static teamError: String = null;
-    static validTeamNumber: Boolean = null;
+    static refError: string = null;
+    static teamError: string = null;
+    static validTeamNumber: boolean = null;
 
     static async commit() {
         try {
@@ -93,18 +99,23 @@ export default class Tabulation {
                 method: 'POST',
                 url: `${apiBaseUrl}/commit`,
                 body: Tabulation.commitForm,
+                responseType: 'json',
+                extract: (xhr) => xhr.response,
             });
 
             if (result && result?.success === true && result?.results?.newTabulationResult?.inserted === 1 && result?.results?.scoreUpdateResult?.replaced === 1) {
                 // Reset the commit form
                 Tabulation.resetCommitForm();
-
                 return true;
             }
 
-            return false;
+            return new Error(result.error);
         } catch (err) {
             // @todo Show some errors
+            if (err.code === 403) {
+                return new Error('The scoreboard has been locked. No updates are currently allowed. Please try again later.');
+            }
+            console.error(`${err.code}: ${err.response?.error ?? 'Unknown Error'}`);
             return false;
         }
     }
@@ -118,6 +129,7 @@ export default class Tabulation {
         Tabulation.commitForm.matchId = null;
         Tabulation.commitForm.teamNumber = null;
         Tabulation.commitForm.teamMemberInitials = '';
+        Tabulation.commitForm.scoreLocked = false;
     }
 
     static async getRefInfo() {
@@ -131,6 +143,7 @@ export default class Tabulation {
             });
 
             if (result?.eventId) {
+                Tabulation.refError = null;
                 Tabulation.refInfo = result;
                 // Get teams from the Ref Info and only show ones that still have runs left
                 Tabulation.teams = Tabulation.refInfo.event.teams
@@ -142,7 +155,9 @@ export default class Tabulation {
                 // Pre-choose team based on the code provided by the team (should be possible)
                 if (Tabulation.teams.some(v => v.id == Tabulation.commitForm.teamNumber)) {
                     console.log('Pre-selecting team: ', Tabulation.commitForm.teamNumber);
-                    setTimeout(() => Tabulation.commitForm.teamId = Tabulation.commitForm.teamNumber.toString(), 0);
+                    setTimeout(() => {
+                        Tabulation.commitForm.teamId = Tabulation.commitForm.teamNumber.toString();
+                    }, 0);
                 } else {
                     console.log(
                         'Come on man...',
@@ -156,7 +171,7 @@ export default class Tabulation {
                 console.error('No ref: ', result);
             }
         }  catch (err) {
-            console.error('Ref ERror:', err.code, err.response);
+            console.error('Ref Error:', err.code, err.response);
             Tabulation.refError = err.response.err;
             Tabulation.resetRef(err.response.err);
         }

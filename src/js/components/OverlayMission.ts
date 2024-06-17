@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import trans from '../helpers/trans';
 import OverlayTask from './OverlayTask';
-import {Mission, MissionObject} from '../interfaces/ChallengeYear';
+import type {Mission, MissionObject} from '../interfaces/ChallengeYear';
 
 interface OverlayMissionAttrs {
   key: number
@@ -25,7 +25,7 @@ export default class OverlayMission implements m.ClassComponent<OverlayMissionAt
     return m('.scoreboard__overlay__mission', {
       className,
     }, m('.content', [
-      m('h1', (mission.number === null ? '' : ('M' + mission.number + ' ')) + trans(mission.title)),
+      m('h1', (mission.number === null ? '' : (`M${mission.number} `)) + trans(mission.title)),
       mission.description && m('p', trans(mission.description)),
       m('.tasks', {
         className: mission.tasks.length > 1 ? ' multiple' : '',
