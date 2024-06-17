@@ -140,3 +140,109 @@ form {
         }
     }
 }
+
+li.hr {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid #cbcbcb;
+}
+
+.backups-page {
+    width: 650px;
+    max-width: 100%;
+    margin: 100px auto;
+}
+
+.backup-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.backups-list {
+    li {
+        border-bottom: 1px solid #bbbbbb;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.backup-score {
+    strong, span {
+        margin-right: 5px;
+    }
+    strong {
+        font-weight: bold;
+    }
+}
+
+.backup-meta {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 5px;
+    justify-content: space-between;
+
+    button.delete-backup {
+        color: white;
+        background-color: #e30000;
+        padding: 5px 10px;
+        border: 1px solid #b20000;
+        border-radius: 5px;
+    }
+}
+
+.no-backups {
+    margin-top: 15px;
+    border: 1px solid #5a9adb;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    background: aliceblue;
+    color: #246094;
+}
+
+.backups-danger-zone {
+    background-color: #fff2f2;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid red;
+    padding-top: 0px;
+    border-top: 3px solid red;
+
+    h3 {
+        color: #e30300;
+    }
+
+    button.delete-all-backups {
+        color: #e30000;
+        background-color: WHITE;
+        padding: 10px 10px;
+        border: 1px solid #b20000;
+        border-radius: 5px;
+        width: 100%;
+    }
+}
+
+.sidenav {
+    li.restore-btn {
+        padding: 5px;
+        text-align: center;
+        background: coral;
+        margin: 15px;
+        border-radius: 10px;
+
+        > a {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    }
+}

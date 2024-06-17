@@ -15,10 +15,20 @@ export interface Team {
     runs: Runs,
 }
 
+export interface Season {
+    id: number,
+    name: string,
+    maxScore: number,
+    active: boolean,
+    startDate: Date,
+    endDate: Date,
+}
+
 export interface RefEvent {
     id: string,
     name: string,
     teams: Array<Team>,
+    season: Season,
 }
 
 export interface Referee {
@@ -32,7 +42,7 @@ export interface RefInfo {
     eventId: string,
     volunteerId: string,
     event: RefEvent,
-    volunteer: Referee
+    volunteer: Referee,
 }
 
 export interface TeamList {
@@ -61,8 +71,6 @@ export interface CommitForm {
 }
 
 const runNameMapping = {
-
-// If practice run is in the list, make it first.
     match1: 'Match 1',
     match2: 'Match 2',
     match3: 'Match 3',
@@ -99,14 +107,27 @@ export default class Tabulation {
         try {
             // Store local backup of the tabulation
             const team = Tabulation.refInfo.event.teams.find(v => v.id === Number.parseInt(Tabulation.commitForm.teamId, 10));
-            const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}`;
+            const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}-${Tabulation.refInfo.eventId}`;
+            const data = {
+                commitForm: Tabulation.commitForm,
+                teamName: team.name,
+                teamId: Tabulation.commitForm.teamId,
+                matchId: Tabulation.commitForm.matchId,
+                matchName: runNameMapping[Tabulation.commitForm.matchId],
+                eventName: Tabulation.refInfo.event.name,
+                eventId: Tabulation.refInfo.event.id,
+                refName: Tabulation.refInfo.volunteer.name,
+                refRole: Tabulation.refInfo.volunteer.role,
+                seasonName: Tabulation.refInfo.event.season.name,
+                ts: new Date(),
+            }
 
             if (localStorage.getItem(key)) {
                 if (confirm("There is already a complete local backup of this team's match. Are you sure you want to overwrite it?")) {
-                    localStorage.setItem(key, JSON.stringify(Tabulation.commitForm));
+                    localStorage.setItem(key, JSON.stringify(data));
                 }
             } else {
-                localStorage.setItem(key, JSON.stringify(Tabulation.commitForm));
+                localStorage.setItem(key, JSON.stringify(data));
             }
 
             // Send tabulation to the server
