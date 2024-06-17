@@ -1,6 +1,7 @@
 import * as m from 'mithril';
 import StandaloneScoreboard from './components/StandaloneScoreboard';
 import CreditsPage from './components/CreditsPage';
+import BackupTabulationsPage from './components/BackupTabulationsPage';
 import {years} from './global';
 import Layout from './components/Layout';
 
@@ -52,6 +53,7 @@ const routes = {
     }
   }),
   '/credits': createResolver(CreditsPage),
+  '/backups': createResolver(BackupTabulationsPage),
 };
 
 // biome-ignore lint/complexity/noForEach: <explanation>

@@ -26,6 +26,17 @@ export default class CreditsPage implements m.ClassComponent {
           '.',
         ]),
         m('p', [
+          'Modified by ',
+          m('a', {
+            href: 'https://kylefarris.com/',
+          }, 'Kyle Farris'),
+          ' for use in ',
+          m('a', {
+            href: 'https://fllgameday.org/',
+          }, 'FLL Gameday'),
+          '.',
+        ]),
+        m('p', [
           'Code is available on ',
           m('a', {
             href: 'https://github.com/robots-ju/fll-scoreboard',

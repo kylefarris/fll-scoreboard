@@ -1,11 +1,17 @@
 import * as m from 'mithril';
 import Scoreboard from './Scoreboard';
 import {NumericHashReader} from '../utils/NumericHashReader';
-import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
+import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 
 export class StandaloneScoreboardAttrs {
   data: Year
   scorer: AbstractScorer<MissionObject, any>
+}
+
+declare global {
+  interface Window {
+      hashReader: NumericHashReader,
+  }
 }
 
 export default class StandaloneScoreboard implements m.ClassComponent<StandaloneScoreboardAttrs> {
@@ -14,9 +20,12 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
   lastMissions: string;
 
   oninit(vnode: m.Vnode<StandaloneScoreboardAttrs>) {
+    console.log('Scoreboard initialized!');
     const {scorer} = vnode.attrs;
     this.hashReader = new NumericHashReader(scorer.initialMissionsState());
     this.missions = scorer.initialMissionsState();
+
+    // window.hashReader = this.hashReader;
 
     if (window.location.hash) {
       try {
@@ -30,8 +39,8 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
           initialMissionsState = JSON.parse(decodeURIComponent(hash));
         }
 
-        for (let attr in initialMissionsState) {
-          if (initialMissionsState.hasOwnProperty(attr) && this.missions.hasOwnProperty(attr)) {
+        for (const attr in initialMissionsState) {
+          if (attr in initialMissionsState && attr in this.missions) {
             this.missions[attr] = initialMissionsState[attr];
           }
         }
@@ -59,7 +68,7 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
         // Remove hash without causing a jump
         window.history.pushState('', document.title, window.location.pathname);
       } else {
-        window.location.hash = '#' + missionHash;
+        window.location.hash = `#${missionHash}`;
       }
 
       this.lastMissions = missionsJson;

@@ -1,4 +1,4 @@
-import {MissionObject} from '../interfaces/ChallengeYear';
+import type {MissionObject} from '../interfaces/ChallengeYear';
 
 interface MissionInfo {
   key: string
@@ -11,6 +11,7 @@ export class NumericHashReader {
   constructor(
     initialMissionsState: MissionObject
   ) {
+    // biome-ignore lint/complexity/noForEach: <explanation>
     Object.keys(initialMissionsState).forEach(key => {
       this.missionTypes.push({
         key,
@@ -25,13 +26,13 @@ export class NumericHashReader {
     const parts = hash.split('');
 
     if (parts.length !== this.missionTypes.length) {
-      throw 'Invalid hash Length (expected: ' + this.missionTypes.length + ', actual: ' + parts.length + ')';
+      throw `Invalid hash Length (expected: ${this.missionTypes.length}, actual: ${parts.length})`;
     }
 
     parts.forEach((value, index) => {
       const mission = this.missionTypes[index];
 
-      state[mission.key] = mission.type === 'number' ? parseInt(value) : value === '1';
+      state[mission.key] = mission.type === 'number' ? Number.parseInt(value) : value === '1';
     });
 
     return state;
