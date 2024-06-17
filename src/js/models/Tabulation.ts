@@ -61,6 +61,8 @@ export interface CommitForm {
 }
 
 const runNameMapping = {
+
+// If practice run is in the list, make it first.
     match1: 'Match 1',
     match2: 'Match 2',
     match3: 'Match 3',
@@ -95,6 +97,19 @@ export default class Tabulation {
 
     static async commit() {
         try {
+            // Store local backup of the tabulation
+            const team = Tabulation.refInfo.event.teams.find(v => v.id === Number.parseInt(Tabulation.commitForm.teamId, 10));
+            const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}`;
+
+            if (localStorage.getItem(key)) {
+                if (confirm("There is already a complete local backup of this team's match. Are you sure you want to overwrite it?")) {
+                    localStorage.setItem(key, JSON.stringify(Tabulation.commitForm));
+                }
+            } else {
+                localStorage.setItem(key, JSON.stringify(Tabulation.commitForm));
+            }
+
+            // Send tabulation to the server
             const result: CommitResult = await m.request({
                 method: 'POST',
                 url: `${apiBaseUrl}/commit`,
@@ -160,7 +175,7 @@ export default class Tabulation {
                     }, 0);
                 } else {
                     console.log(
-                        'Come on man...',
+                        'Team-provided team number does not match any valid teams for the event.',
                         Tabulation.teams.map(v => v.id),
                         Tabulation.commitForm.teamNumber,
                         Tabulation.teams.some(v => v.id === Tabulation.commitForm.teamNumber),
@@ -195,6 +210,12 @@ export default class Tabulation {
         Tabulation.matches = Object.keys(team.runs)
             .filter(v => team.runs[v] === null)
             .map(v => ({ id: v, name: runNameMapping[v] }));
+
+        // If practice run is in the list, put it at the top
+        const practiceIndex = Tabulation.matches.findIndex(v => v.name === 'Practice');
+        if (practiceIndex > 0) {
+            Tabulation.matches.unshift(Tabulation.matches.splice(practiceIndex, 1)[0]);
+        }
 
         Tabulation.commitForm.matchId = Tabulation.matches[0].id;
     }
