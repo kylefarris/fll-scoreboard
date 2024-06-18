@@ -67,6 +67,25 @@ form {
     }
 }
 
+.info {
+    padding: 15px;
+    border: 1px solid #5a9adb;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content:left;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    p {
+        margin: 0px;
+    }
+
+    i {
+        color: #5a9adb;
+    }
+}
+
 .form-lock {
     margin-top: 25px;
     border-top: 4px solid rgb(27, 27, 27);

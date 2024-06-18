@@ -20,7 +20,7 @@ export default class StandaloneScoreboard implements m.ClassComponent<Standalone
   lastMissions: string;
 
   oninit(vnode: m.Vnode<StandaloneScoreboardAttrs>) {
-    console.log('Scoreboard initialized!');
+    // console.log('Scoreboard initialized!');
     const {scorer} = vnode.attrs;
     this.hashReader = new NumericHashReader(scorer.initialMissionsState());
     this.missions = scorer.initialMissionsState();
