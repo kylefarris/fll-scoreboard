@@ -65,6 +65,7 @@ export interface CommitForm {
     teamId: string,
     matchId: string,
     score: number,
+    gpScore: number,
     // biome-ignore lint/complexity/noBannedTypes: <explanation>
     missions: Object,
     scoreLocked: boolean,
@@ -97,6 +98,7 @@ export default class Tabulation {
         teamId: null,
         matchId: null,
         score: null,
+        gpScore: 3,
         missions: {},
         scoreLocked: false,
     };
@@ -106,6 +108,10 @@ export default class Tabulation {
 
     static async commit() {
         try {
+            // Set the Gracious Professionalism score
+            const gpKey = Object.keys(Tabulation.commitForm.missions).find(v => /professionalism$/.test(v));
+            if (gpKey) Tabulation.commitForm.gpScore = Tabulation.commitForm.missions[gpKey];
+
             // Store local backup of the tabulation
             const team = Tabulation.refInfo.event.teams.find(v => v.id === Number.parseInt(Tabulation.commitForm.teamId, 10));
             const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}-${Tabulation.refInfo.eventId}`;
@@ -167,6 +173,7 @@ export default class Tabulation {
         Tabulation.commitForm.teamNumber = null;
         Tabulation.commitForm.teamMemberInitials = '';
         Tabulation.commitForm.scoreLocked = false;
+        Tabulation.commitForm.gpScore = 3;
     }
 
     static async getRefInfo() {
