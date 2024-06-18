@@ -148,7 +148,9 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               if (!Tabulation.commitForm.matchId || !matchKeys.includes(Tabulation.commitForm.matchId)) return fail('No/Invalid "Match Scored" value.');
 
               try {
+                Tabulation.committing = true;
                 const result = await Tabulation.commit();
+                Tabulation.committing = false;
                 if (result === true) {
                   const initial = scorer.initialMissionsState();
                   // biome-ignore lint/complexity/noForEach: <explanation>
@@ -238,7 +240,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               'button',
               {
                 type: 'submit',
-                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId || !Tabulation.commitForm.matchId
+                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId || !Tabulation.commitForm.matchId || Tabulation.committing
               },
               'Submit Score'
             )

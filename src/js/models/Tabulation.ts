@@ -80,6 +80,7 @@ const runNameMapping = {
 // biome-ignore lint/complexity/noStaticOnlyClass: <explanation>
 export default class Tabulation {
     static matches = [];
+    static committing = false;
     static refInfo: RefInfo = {
         id: null,
         eventId: null,

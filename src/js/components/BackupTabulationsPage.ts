@@ -4,23 +4,38 @@ import { NumericHashReader } from '../utils/NumericHashReader';
 
 export default class BackupTabulationsPage implements m.ClassComponent {
   view() {
-    const backups = Object.keys({ ...localStorage }).filter(v => localStorage[v]?.commitForm);
+    const backups = Object.keys({ ...localStorage }).filter(v => {
+      try {
+        return ('commitForm' in JSON.parse(localStorage?.[v]))
+      } catch (_err) {
+        return false;
+      }
+    });
+    console.log('Backups: ', backups);
     return [
       m('header.scoreboard__header', [
         m('i.header-block.fas.fa-bars.sidenav-trigger', {
           'data-target': 'menu',
         }),
-        m('h1..scoreboard__header__title.header-block', [
+        m('h1.scoreboard__header__title.header-block', [
           m('em', 'FLL Gameday'),
           ' Calculator',
         ]),
       ]),
       m('.backups-page', [
         m('h1', 'Local Tabulation Backups'),
+        m('div.info', [
+          m('i', { ariaHidden: 'true', class: 'fas fa-info' }),
+          m('p',
+            `Whenever a scorecard is submitted with a referee code, the tabulation is saved locally on this device (and this device only)
+            before being saved on Gameday servers. This is for extra security/backup in case the server is experiencing issues or wifi is
+            no longer working.`
+          )
+        ]),
         m('ul.backups-list', backups.map(v => {
           try {
             const tab = JSON.parse(localStorage[v]);
-            // console.log('Tab:', tab);
+            console.log('Tab:', tab);
             const gpKey = Object.keys(tab.commitForm.missions).find(v => /professionalism$/.test(v));
             const gpScore = tab.commitForm.missions[gpKey];
 
@@ -71,7 +86,8 @@ export default class BackupTabulationsPage implements m.ClassComponent {
               ]),
             ])
           } catch (err) {
-            console.error('Could not parse stored tabulation.');
+            // console.error('Could not parse stored tabulation.');
+            return '';
           }
         })),
         m(
