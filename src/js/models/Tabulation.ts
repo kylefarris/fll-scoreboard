@@ -132,6 +132,10 @@ export default class Tabulation {
             if (localStorage.getItem(key)) {
                 if (confirm("There is already a complete local backup of this team's match. Are you sure you want to overwrite it?")) {
                     localStorage.setItem(key, JSON.stringify(data));
+                } else {
+                    if (!confirm('Do you still want to submit to this score to the server?')) {
+                        return new Error('Saving score was cancelled by the user. Score was not saved locally or on Gameday servers.');
+                    }
                 }
             } else {
                 localStorage.setItem(key, JSON.stringify(data));
