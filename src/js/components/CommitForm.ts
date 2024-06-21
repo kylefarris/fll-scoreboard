@@ -45,12 +45,12 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               } else {
                 const refCode = prompt('Provide your referee code to unlock scoring:');
 
-                if (refCode.trim().length === 6) {
+                if (/^[A-Z0-9]{6}$/i.test(refCode.trim())) {
                   Tabulation.commitForm.refCode = refCode.toUpperCase().trim();
 
                   await Tabulation.getRefInfo();
                   setTimeout(() => {
-                    if (Tabulation.refError === null) {
+                    if (Tabulation.refError === null || Tabulation.noWifi) {
                       Tabulation.commitForm.scoreLocked = false;
                     } else {
                       fail(Tabulation.refError.toString());
@@ -160,7 +160,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
 
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   M.toast({
-                    html: 'Score Received!',
+                    html: Tabulation.noWifi ? 'Score Saved Locally Only' : 'Score Received!',
                     classes: 'green text-white',
                   });
                 }
@@ -193,6 +193,13 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                       if (Tabulation.refError !== null) {
                         fail(Tabulation.refError.toString());
                         Tabulation.resetRef(Tabulation.refError);
+                      } else {
+                        // if (Tabulation.noWifi) {
+                        //   M.toast({
+                        //     html: 'Connection Restored!',
+                        //     classes: 'green text-white',
+                        //   });
+                        // }
                       }
                     }, 0);
                   } else {
@@ -227,7 +234,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               m('label', 'Match Scored'),
               m('select', {
                 name: 'matchId',
-                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId,
+                disabled: (!Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId) && !Tabulation.noWifi,
                 oninput(e) {
                   Tabulation.commitForm.matchId = e.target.value;
                 },
@@ -240,7 +247,7 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
               'button',
               {
                 type: 'submit',
-                disabled: !Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId || !Tabulation.commitForm.matchId || Tabulation.committing
+                disabled: (!Tabulation.refInfo?.eventId || !Tabulation.commitForm.teamId || !Tabulation.commitForm.matchId || Tabulation.committing) && !Tabulation.noWifi
               },
               'Submit Score'
             )

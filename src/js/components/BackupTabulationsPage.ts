@@ -43,11 +43,13 @@ export default class BackupTabulationsPage implements m.ClassComponent {
             const scoreHash = hashReader.encode(tab.commitForm.missions);
             console.log('The Score Hash: ', scoreHash);
 
+            const seasonName = (tab?.seasonName ?? 'Unknown Season') === 'Unknown Season' ? 'masterpiece' : tab.seasonName;
+
             return m('li', [
               m('div.backup-title', [
                 m(
                   m.route.Link, {
-                    href: `/${tab.seasonName?.toLowerCase()}#${scoreHash}`,
+                    href: `/${seasonName.toLowerCase() ?? 'masterpiece'}#${scoreHash}`,
                     className: 'waves-effect',
                     onclick() {
                       Tabulation.commitForm = tab.commitForm;

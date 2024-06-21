@@ -265,3 +265,24 @@ li.hr {
         }
     }
 }
+
+.offline-error {
+    position: fixed;
+    top: 50px;
+    width: 100vw;
+    background-color: rgba(220, 0, 0, 0.768);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px 0px;
+    z-index: 1000;
+
+    a:link, a:visited {
+        color: white;
+        text-decoration: underline;
+    }
+
+    a:hover, a:active {
+        color: yellow;
+    }
+}

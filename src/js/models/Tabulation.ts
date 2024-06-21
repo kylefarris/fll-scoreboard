@@ -71,6 +71,10 @@ export interface CommitForm {
     scoreLocked: boolean,
 }
 
+export interface GamedayScoreboard {
+    id: number,
+}
+
 const runNameMapping = {
     match1: 'Match 1',
     match2: 'Match 2',
@@ -82,6 +86,7 @@ const runNameMapping = {
 export default class Tabulation {
     static matches = [];
     static committing = false;
+    static noWifi = false;
     static refInfo: RefInfo = {
         id: null,
         eventId: null,
@@ -113,21 +118,26 @@ export default class Tabulation {
             if (gpKey) Tabulation.commitForm.gpScore = Tabulation.commitForm.missions[gpKey];
 
             // Store local backup of the tabulation
-            const team = Tabulation.refInfo.event.teams.find(v => v.id === Number.parseInt(Tabulation.commitForm.teamId, 10));
-            const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}-${Tabulation.refInfo.eventId}`;
+            const team = Tabulation?.refInfo?.event?.teams?.find(v => v.id === Number.parseInt(Tabulation?.commitForm?.teamId, 10)) ?? {
+                name: `Unknown Team #${Tabulation.commitForm.teamId}`,
+            };
+            // console.log('Team Info: ', team);
+            const key = `${Tabulation.commitForm.teamId}-${team.name}-${Tabulation.commitForm.matchId}-${Tabulation?.refInfo?.eventId ?? 'unknown' }`;
+            // console.log('Local Save Key: ', key);
             const data = {
                 commitForm: Tabulation.commitForm,
                 teamName: team.name,
                 teamId: Tabulation.commitForm.teamId,
                 matchId: Tabulation.commitForm.matchId,
                 matchName: runNameMapping[Tabulation.commitForm.matchId],
-                eventName: Tabulation.refInfo.event.name,
-                eventId: Tabulation.refInfo.event.id,
-                refName: Tabulation.refInfo.volunteer.name,
-                refRole: Tabulation.refInfo.volunteer.role,
-                seasonName: Tabulation.refInfo.event.season.name,
+                eventName: Tabulation.refInfo?.event?.name ?? 'Unknown Event',
+                eventId: Tabulation.refInfo?.event?.id ?? 'unknown-event-id',
+                refName: Tabulation.refInfo?.volunteer?.name ?? `Referee ${Tabulation.commitForm.refCode}`,
+                refRole: Tabulation.refInfo?.volunteer?.role ?? 'Referee',
+                seasonName: Tabulation.refInfo?.event?.season?.name ?? 'Unknown Season',
                 ts: new Date(),
             }
+            // console.log('Local Save Data: ', data);
 
             if (localStorage.getItem(key)) {
                 if (confirm("There is already a complete local backup of this team's match. Are you sure you want to overwrite it?")) {
@@ -138,6 +148,7 @@ export default class Tabulation {
                     }
                 }
             } else {
+                // console.log('Backup stored locally');
                 localStorage.setItem(key, JSON.stringify(data));
             }
 
@@ -156,13 +167,47 @@ export default class Tabulation {
                 return true;
             }
 
+            if (Tabulation.noWifi) {
+                Tabulation.resetCommitForm();
+                return true;
+            }
+
             return new Error(result.error);
         } catch (err) {
             // @todo Show some errors
             if (err.code === 403) {
                 return new Error('The scoreboard has been locked. No updates are currently allowed. Please try again later.');
             }
-            console.error(`${err.code}: ${err.response?.error ?? 'Unknown Error'}`);
+
+            if (Tabulation.noWifi) {
+                console.log('Error caught while no wifi: ', err);
+                return true;
+            }
+
+            // console.error(`${err.code}: ${err.response?.error ?? 'Unknown Error'}`);
+            return false;
+        }
+    }
+
+    static async checkConnectivity() {
+        try {
+            const result:GamedayScoreboard = await m.request({
+                method: 'GET',
+                url: 'https://api.fllgameday.org/scoreboard/3EBE2C161BFB',
+                responseType: 'json',
+            });
+
+            if (Array.isArray(result) && result.length > 0 && result[0]?.id) {
+                console.log('Connection is back!');
+                Tabulation.noWifi = false;
+                return true;
+            }
+            console.log('Connection is still not working');
+            console.log(result);
+            return false;
+        } catch (err) {
+            console.log('No connection still');
+            Tabulation.noWifi = true;
             return false;
         }
     }
@@ -180,7 +225,7 @@ export default class Tabulation {
         Tabulation.commitForm.gpScore = 3;
     }
 
-    static async getRefInfo() {
+    static async getRefInfo(unlock = false) {
         if (!/^[A-Z0-9]{6}$/i.test(Tabulation.commitForm.refCode)) return;
 
         try {
@@ -189,6 +234,8 @@ export default class Tabulation {
                 url: `${apiBaseUrl}/login`,
                 body: { refCode: Tabulation.commitForm.refCode.toUpperCase() },
             });
+
+            Tabulation.noWifi = false;
 
             if (result?.eventId) {
                 Tabulation.refError = null;
@@ -219,9 +266,29 @@ export default class Tabulation {
                 console.error('No ref: ', result);
             }
         }  catch (err) {
-            console.error('Ref Error:', err.code, err.response);
-            Tabulation.refError = err.response.err;
-            Tabulation.resetRef(err.response.err);
+            console.error('Ref Error:', err?.code, err?.response);
+            if (err?.code === 0 && err?.response === null) {
+                console.log('No internet connectivity');
+                Tabulation.noWifi = true;
+                
+                if (unlock === false) {
+                    Tabulation.commitForm.teamId = Tabulation.commitForm?.teamNumber?.toString();
+                    Tabulation.matches = Object.keys(runNameMapping).map(v => ({
+                        id: v,
+                        name: runNameMapping[v],
+                    }));
+                    // Put practice match at the top
+                    const practiceIndex = Tabulation.matches.findIndex(v => v.name === 'Practice');
+                    if (practiceIndex > 0) {
+                        Tabulation.matches.unshift(Tabulation.matches.splice(practiceIndex, 1)[0]);
+                    }
+
+                    // Pre-select Practice match
+                    Tabulation.commitForm.matchId = Tabulation.matches[0].id;
+                }
+            }
+            Tabulation.refError = err?.response?.err ?? 'No internet connectivity!';
+            Tabulation.resetRef(err?.response?.err);
         }
     }
 
