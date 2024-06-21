@@ -136,6 +136,29 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           }, trans(warning_data).replace('%warning%', warning));
         }
       )),
+      m('.offline-error', {
+        style: `visibility: ${Tabulation.noWifi ? 'visible' : 'hidden'}`
+      }, [
+        m('span', 'No Internet Connectivity! Local Save Mode Only! '),
+        m('a', {
+          href: '#',
+          async onclick(e) {
+            e.preventDefault();
+            const result = await Tabulation.checkConnectivity();
+            if (result) {
+              M.toast({
+                html: 'Connection Restored!',
+                classes: 'green text-white',
+              });
+            } else {
+              M.toast({
+                html: 'Connection still not available!',
+                classes: 'red text-white',
+              });
+            }
+          }
+        }, 'Check Connection')
+      ]),
       m(GridBoard, {
         data,
         missions,
