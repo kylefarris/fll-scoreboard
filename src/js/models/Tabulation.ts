@@ -1,4 +1,5 @@
 import * as m from 'mithril';
+import { years } from '../global';
 
 const apiBaseUrl = 'https://api.fllgameday.org/tabulation';
 
@@ -134,7 +135,7 @@ export default class Tabulation {
                 eventId: Tabulation.refInfo?.event?.id ?? 'unknown-event-id',
                 refName: Tabulation.refInfo?.volunteer?.name ?? `Referee ${Tabulation.commitForm.refCode}`,
                 refRole: Tabulation.refInfo?.volunteer?.role ?? 'Referee',
-                seasonName: Tabulation.refInfo?.event?.season?.name ?? 'Unknown Season',
+                seasonName: Tabulation.refInfo?.event?.season?.name ?? years[0].data.meta.slug,
                 ts: new Date(),
             }
             // console.log('Local Save Data: ', data);
