@@ -1,6 +1,7 @@
 import * as m from 'mithril';
 import Tabulation from '../models/Tabulation';
 import { NumericHashReader } from '../utils/NumericHashReader';
+import { years } from '../global';
 
 export default class BackupTabulationsPage implements m.ClassComponent {
   view() {
@@ -40,13 +41,14 @@ export default class BackupTabulationsPage implements m.ClassComponent {
             const hashReader = new NumericHashReader(tab.commitForm.missions);
             const scoreHash = hashReader.encode(tab.commitForm.missions);
 
-            const seasonName = (tab?.seasonName ?? 'Unknown Season') === 'Unknown Season' ? 'masterpiece' : tab.seasonName;
+            // Handle cases where season name is set to 'Unknown Season' (now deprecated)
+            const seasonName = (tab?.seasonName ?? 'Unknown Season') === 'Unknown Season' ? years[0].data.meta.slug : tab.seasonName;
 
             return m('li', [
               m('div.backup-title', [
                 m(
                   m.route.Link, {
-                    href: `/${seasonName.toLowerCase() ?? 'masterpiece'}#${scoreHash}`,
+                    href: `/${seasonName.toLowerCase() ?? `${years[0].data.meta.slug}`}#${scoreHash}`,
                     className: 'waves-effect',
                     onclick() {
                       Tabulation.commitForm = tab.commitForm;
