@@ -11,7 +11,6 @@ export default class BackupTabulationsPage implements m.ClassComponent {
         return false;
       }
     });
-    console.log('Backups: ', backups);
     return [
       m('header.scoreboard__header', [
         m('i.header-block.fas.fa-bars.sidenav-trigger', {
@@ -35,13 +34,11 @@ export default class BackupTabulationsPage implements m.ClassComponent {
         m('ul.backups-list', backups.map(v => {
           try {
             const tab = JSON.parse(localStorage[v]);
-            console.log('Tab:', tab);
             const gpKey = Object.keys(tab.commitForm.missions).find(v => /professionalism$/.test(v));
             const gpScore = tab.commitForm.missions[gpKey];
 
             const hashReader = new NumericHashReader(tab.commitForm.missions);
             const scoreHash = hashReader.encode(tab.commitForm.missions);
-            console.log('The Score Hash: ', scoreHash);
 
             const seasonName = (tab?.seasonName ?? 'Unknown Season') === 'Unknown Season' ? 'masterpiece' : tab.seasonName;
 
