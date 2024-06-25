@@ -1,0 +1,288 @@
+small.error-info {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: red;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.3rem;
+    font-size:0.9rem;
+}
+form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        label {
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+
+        input, select {
+            min-width: 185px;
+            height: 50px;
+            padding-left: 15px;
+            font-size: 1.1rem;
+
+            &.invalid {
+                border: 2px solid red;
+            }
+        }
+    }
+
+    button {
+        flex: 1;
+        height: 50px;
+        color: white;
+        background: #102758;
+        border: 1px solid black;
+        border-radius: 5px;
+        min-width: 185px;
+        font-size: 1.2rem;
+        margin-top: 15px;
+
+        &:hover {
+            background-color: #003dbd;
+            border: 1px solid #7da7ff;
+            cursor: pointer;
+        }
+    }
+
+    button[disabled=disabled],
+    button:disabled {
+        background-color: #cacaca;
+        color: rgb(164 164 164);
+        border: 1px solid rgb(161 161 161);
+        opacity: 0.5;
+
+        &:hover {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.info {
+    padding: 15px;
+    border: 1px solid #5a9adb;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content:left;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    p {
+        margin: 0px;
+    }
+
+    i {
+        color: #5a9adb;
+    }
+}
+
+.form-lock {
+    margin-top: 25px;
+    border-top: 4px solid rgb(27, 27, 27);
+    background: #585858;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    button.lock-btn {
+        height: 50px;
+        color: white;
+        background: #2c2c2c;
+        border: 1px solid #858585;
+        border-radius: 5px;
+        min-width: 185px;
+        font-size: 1.2rem;
+        margin-top: 15px;
+
+        &:hover {
+            background-color: rgb(210, 210, 210);
+            border: 1px solid #101010;
+            color: black;
+            cursor: pointer;
+        }
+    }
+}
+
+.team-signature-form {
+    margin-top: 25px;
+    border-top: 4px solid rgb(3 60 27);
+    background: #007633;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+
+    button {
+        background: #0a3f15;
+        border: 1px solid #052709;
+
+        &:hover {
+            background-color: #46b858;
+            border: 1px solid #9bd99a;
+        }
+    }
+}
+
+.gameday-form {
+    margin-top: 25px;
+    border-top: 4px solid rgb(16 39 88);
+    background: #3576ff;
+    padding: 25px;
+    padding-top: 7px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+
+    button {
+        background: #102758;
+        border: 1px solid black;
+
+        &:hover {
+            background-color: #003dbd;
+            border: 1px solid #7da7ff;
+        }
+    }
+}
+
+li.hr {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid #cbcbcb;
+}
+
+.backups-page {
+    width: 650px;
+    max-width: 100%;
+    margin: 100px auto;
+}
+
+.backup-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.backups-list {
+    li {
+        border-bottom: 1px solid #bbbbbb;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.backup-score {
+    strong, span {
+        margin-right: 5px;
+    }
+    strong {
+        font-weight: bold;
+    }
+}
+
+.backup-meta {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 5px;
+    justify-content: space-between;
+
+    button.delete-backup {
+        color: white;
+        background-color: #e30000;
+        padding: 5px 10px;
+        border: 1px solid #b20000;
+        border-radius: 5px;
+    }
+}
+
+.no-backups {
+    margin-top: 15px;
+    border: 1px solid #5a9adb;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    background: aliceblue;
+    color: #246094;
+}
+
+.backups-danger-zone {
+    background-color: #fff2f2;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid red;
+    padding-top: 0px;
+    border-top: 3px solid red;
+
+    h3 {
+        color: #e30300;
+    }
+
+    button.delete-all-backups {
+        color: #e30000;
+        background-color: WHITE;
+        padding: 10px 10px;
+        border: 1px solid #b20000;
+        border-radius: 5px;
+        width: 100%;
+    }
+}
+
+.sidenav {
+    li.restore-btn {
+        padding: 5px;
+        text-align: center;
+        background: coral;
+        margin: 15px;
+        border-radius: 10px;
+
+        > a {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    }
+}
+
+.offline-error {
+    position: fixed;
+    top: 50px;
+    width: 100vw;
+    background-color: rgba(220, 0, 0, 0.768);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px 0px;
+    z-index: 1000;
+
+    a:link, a:visited {
+        color: white;
+        text-decoration: underline;
+    }
+
+    a:hover, a:active {
+        color: yellow;
+    }
+}

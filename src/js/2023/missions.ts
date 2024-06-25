@@ -1,4 +1,4 @@
-import {Year} from '../interfaces/ChallengeYear';
+import { Year } from '../interfaces/ChallengeYear';
 
 const data: Year = {
   meta: {
@@ -34,7 +34,7 @@ const data: Year = {
   },
   missions: [
     {
-      number: 0,
+      number: null,
       title: {
         en: 'Equipment Inspection',
         fr: 'Inspection de l\'équipement',
@@ -48,7 +48,7 @@ const data: Year = {
           options: [
             {
               title: {
-                en: 'Your robot and all your equipment fit completely in one launch area and are under a height limit of 305 mm',
+                en: 'Your robot and all your equipment fit completely in one launch area and are under a height limit of 305 mm (12 inches)',
                 fr: 'Votre robot et tout votre équipement tiennent complètement dans une zone de lancement et leur hauteur est inférieure à la limite de 305 mm',
               },
               handle: 'm00_small_inspection_area',
@@ -723,6 +723,41 @@ const data: Year = {
         {
           en: 'You can lose one precision token without it affecting your score.',
           fr: 'Vous pouvez perdre un jeton de précision sans que cela nuise à votre score.',
+        },
+      ],
+    },
+    {
+      number: 'GP',
+      title: {
+        en: 'Gracious Professionalism®',
+        fr: 'Gracious Professionalism',
+      },
+      position: {
+        top: 85,
+        left: 93,
+      },
+      tasks: [
+        {
+          options: [
+            {
+              title: {
+                en: 'Gracious Professionalism® displayed at the robot game table',
+                fr: 'Gracious Professionalism® displayed at the robot game table',
+              },
+              handle: 'm17_gracious_professionalism',
+              type: 'number',
+              max: 4,
+              min: 2,
+              points: 0,
+              labels: [
+                '',
+                '2 Developing',
+                '3 Accomplished',
+                '4 Exceeds',
+              ],
+              images: [],
+            },
+          ],
         },
       ],
     },

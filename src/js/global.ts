@@ -19,15 +19,15 @@ const texts = {
       fr: 'Fermer',
     },
     launch_wizard: {
-      en: 'Launch wizard',
+      en: 'Launch Wizard',
       fr: 'Lancer l\'assistant',
     },
     about: {
-      en: 'The Robots-JU Scoreboard is an unofficial Robot Game scoreboard for the FIRST LEGO League #IntoOrbit season',
+      en: 'The FLL Gameday calculator is an unofficial Robot Game calculator for the FIRST LEGO League',
       fr: 'Le Scoreboard Robots-JU est un tableau de score non officiel pour le Robot-Game de la FIRST LEGO League #IntoOrbit',
     },
     reset: {
-      en: 'Reset score',
+      en: 'Reset Score',
       fr: 'Remettre à zéro',
     },
     yes: {

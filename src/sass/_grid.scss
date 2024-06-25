@@ -1,9 +1,13 @@
 .scoreboard__grid {
-  margin: 60px auto 180px;
+  margin: 110px auto 65px;
   max-width: 800px;
 
   &.--overlay-open {
     margin-left: 0;
+  }
+
+  @media (max-width: 635px) {
+    margin: 110px auto 108px;
   }
 
   @media (min-width: 1800px) {
@@ -49,7 +53,7 @@
   }
 
   .scoreboard__grid__mission .description, .constraints {
-    color: #aaa;
+    color: #757575;
   }
 
   .constraints ul {
@@ -59,6 +63,7 @@
 
 .scoreboard__grid__mission {
   border-top: 2px solid var(--challenge-missions-color);
+  margin-top: 15px;
 
   .number, .title {
     display: inline-block;

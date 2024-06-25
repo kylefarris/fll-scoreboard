@@ -1,7 +1,8 @@
 import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import trans from '../helpers/trans';
-import {MissionObject, Option} from '../interfaces/ChallengeYear';
+import Tabulation from '../models/Tabulation';
+import type {MissionObject, Option} from '../interfaces/ChallengeYear';
 
 interface OverlayOptionNumberAttrs {
   option: Option
@@ -13,9 +14,10 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
   view(vnode: m.Vnode<OverlayOptionNumberAttrs>) {
     const {option, missions, controlOnly} = vnode.attrs;
 
-    let inputs = [];
+    const inputs = [];
+    const min = option.min ? option.min : 0;
 
-    for (let number = 0; number <= option.max; number++) {
+    for (let number = min; number <= option.max; number++) {
       let pointsForThisOption = null;
 
       if (option.points) {
@@ -74,24 +76,42 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
         }
       }
 
+      let label = '';
+      
+      if (option.labels) {
+        if (number === 0) {
+          label = '-';
+        } else if (indexForThisNumbersPointsOrLabel < option.labels.length) {
+          label = option.labels[indexForThisNumbersPointsOrLabel];
+        }
+      }
+
       inputs.push(m('.number.waves-effect', {
         className: missions[option.handle] === number ? ' active' : '',
         onclick() {
+          // Prevent if the scoring is locked by a ref
+          if (Tabulation.commitForm.scoreLocked) return false;
+
           missions[option.handle] = number;
         },
       }, [
-        option.colors_list ? m('.color-disc', color ? {
-          style: {
-            backgroundColor: color,
-          },
-        } : {
-          className: 'no-color',
-        }) : m('.digit', number),
+        option.colors_list ?
+          m(
+            '.color-disc',
+            color ? {
+              style: {
+                backgroundColor: color,
+              },
+            } : {
+              className: 'no-color',
+            }
+          )
+          : option.labels ? m('.label', label) : m('.digit', number),
         pointsForThisOption !== null ? m('.points', (pointsForThisOption > 0 ? '+' : '') + pointsForThisOption) : null,
       ]));
     }
 
-    const inputsGroup = m('.numbers-input' + (inputs.length > 4 ? '.numbers-input-many' : ''), inputs);
+    const inputsGroup = m(`.numbers-input${inputs.length > 4 || /gracious/i.test(option.handle) ? '.numbers-input-many' : ''}`, inputs);
 
     if (controlOnly) {
       return m('.scoreboard__option', inputsGroup);

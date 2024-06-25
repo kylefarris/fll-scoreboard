@@ -8,8 +8,8 @@ export default class CreditsPage implements m.ClassComponent {
           'data-target': 'menu',
         }),
         m('h1..scoreboard__header__title.header-block', [
-          m('em', 'Robots-JU'),
-          ' FLL Scoreboard',
+          m('em', 'FLL Gameday'),
+          ' Calculator',
         ]),
       ]),
       m('.textpage', [
@@ -23,6 +23,17 @@ export default class CreditsPage implements m.ClassComponent {
           m('a', {
             href: 'https://robots-ju.ch/',
           }, 'Robots-JU'),
+          '.',
+        ]),
+        m('p', [
+          'Modified by ',
+          m('a', {
+            href: 'https://kylefarris.com/',
+          }, 'Kyle Farris'),
+          ' for use in ',
+          m('a', {
+            href: 'https://fllgameday.org/',
+          }, 'FLL Gameday'),
           '.',
         ]),
         m('p', [

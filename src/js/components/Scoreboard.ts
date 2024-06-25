@@ -2,11 +2,12 @@ import * as m from 'mithril';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
 import OverlayMission from './OverlayMission';
-import TopViewField from './TopViewField';
+// import TopViewField from './TopViewField';
 import Configuration from '../utils/Configuration';
 import {texts} from '../global';
-import {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
+import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import GridBoard from './GridBoard';
+import Tabulation from '../models/Tabulation';
 
 export interface ScoreboardAttrs {
   missions: MissionObject
@@ -17,7 +18,7 @@ export interface ScoreboardAttrs {
 export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
   focused_mission = -1
   missionsCount: number
-  gridMode: boolean = false
+  gridMode = false
 
   oninit(vnode: m.Vnode<ScoreboardAttrs>) {
     // Need to copy this value because it will be used in a callback without access to vnode
@@ -52,7 +53,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         newIndex = -1;
         break;
       default:
-        newIndex = typeof mission === 'string' ? parseInt(mission) : mission;
+        newIndex = typeof mission === 'string' ? Number.parseInt(mission) : mission;
     }
 
     this.focused_mission = newIndex;
@@ -77,12 +78,12 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         }),
         m('img.logo', {
           src: Configuration.imagePath + data.meta.logo,
-          alt: data.meta.title + ' season logo',
+          alt: `${data.meta.title} season logo`,
         }),
-        m('.header-block.score', 'Score: ' + score),
+        m('.header-block.score', `Score: ${score}`),
         m('h1..scoreboard__header__title.header-block', [
-          m('em', 'Robots-JU'),
-          ' FLL Scoreboard',
+          m('em', 'FLL Gameday'),
+          ' Calculator',
         ]),
         m('.overlay-nav', {
           className: this.focused_mission !== -1 ? ' active' : '',
@@ -116,7 +117,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
 
           let warning_data = null;
 
-          if (warning_key && data.warnings.hasOwnProperty(warning_key)) {
+          if (warning_key && (warning_key in data.warnings)) {
             warning_data = data.warnings[warning_key];
           } else {
             warning_data = texts.strings.unknown_warning;
@@ -135,14 +136,34 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           }, trans(warning_data).replace('%warning%', warning));
         }
       )),
-      this.gridMode ? m(GridBoard, {
+      m('.offline-error', {
+        style: `visibility: ${Tabulation.noWifi ? 'visible' : 'hidden'}`
+      }, [
+        m('span', 'No Internet Connectivity! Local Save Mode Only! '),
+        m('a', {
+          href: '#',
+          async onclick(e) {
+            e.preventDefault();
+            const result = await Tabulation.checkConnectivity();
+            if (result) {
+              M.toast({
+                html: 'Connection Restored!',
+                classes: 'green text-white',
+              });
+            } else {
+              M.toast({
+                html: 'Connection still not available!',
+                classes: 'red text-white',
+              });
+            }
+          }
+        }, 'Check Connection')
+      ]),
+      m(GridBoard, {
         data,
         missions,
-        focused_mission: this.focused_mission,
-        focusMission: this.focusMission.bind(this),
-      }) : m(TopViewField, {
-        data,
-        missions,
+        score,
+        scorer,
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
       }),
@@ -159,30 +180,20 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
       m('.tools', [
         m('button.btn.btn-larger', {
           onclick() {
-            const initial = scorer.initialMissionsState();
-            Object.keys(initial).forEach(key => {
-              missions[key] = initial[key];
-            });
+            if (confirm('Are you sure you want to start over??')) {
+              const initial = scorer.initialMissionsState();
+              // biome-ignore lint/complexity/noForEach: <explanation>
+              Object.keys(initial).forEach(key => {
+                missions[key] = initial[key];
+              });
+
+              Tabulation.resetCommitForm();
+            }
           },
         }, [
           icon('eraser'),
           ' ',
           trans(texts.strings.reset),
-        ]),
-        m('button.btn', {
-          onclick: () => {
-            this.gridMode = !this.gridMode;
-            this.focused_mission = -1;
-            window.localStorage.setItem('gridMode', this.gridMode ? '1' : '0');
-          },
-        }, this.gridMode ? [
-          icon('map'),
-          ' ',
-          trans(texts.strings.map_mode),
-        ] : [
-          icon('list'),
-          ' ',
-          trans(texts.strings.grid_mode),
         ]),
       ]),
     ]);
