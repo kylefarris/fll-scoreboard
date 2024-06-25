@@ -193,13 +193,6 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                       if (Tabulation.refError !== null) {
                         fail(Tabulation.refError.toString());
                         Tabulation.resetRef(Tabulation.refError);
-                      } else {
-                        // if (Tabulation.noWifi) {
-                        //   M.toast({
-                        //     html: 'Connection Restored!',
-                        //     classes: 'green text-white',
-                        //   });
-                        // }
                       }
                     }, 0);
                   } else {
