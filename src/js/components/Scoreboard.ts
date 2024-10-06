@@ -73,6 +73,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
 
     if (data.meta.no_equipment_constraint_icon) {
       style['--challenge-no-equipment-constraint-image'] = `url(${Configuration.imagePath}${data.meta.no_equipment_constraint_icon})`;
+    }
 
     return m('div', {
       style,
