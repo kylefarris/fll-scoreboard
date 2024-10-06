@@ -5,6 +5,7 @@ import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeY
 import CommitForm from './CommitForm';
 import Tabulation from '../models/Tabulation';
 import trans from '../helpers/trans';
+import NoEquipmentIndicator from './NoEquipmentIndicator';
 
 interface GridBoardAttrs {
   data: Year
@@ -28,6 +29,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
             style: `display: ${mission.number === 'GP' && Tabulation.commitForm.scoreLocked ? 'none' : 'block'};`,
           },
           [
+            mission.no_equipment_constraint ? m(NoEquipmentIndicator) : null,
             m('.number', {
               onclick() {
                 focusMission(missionIndex);
