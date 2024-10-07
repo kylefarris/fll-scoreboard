@@ -790,6 +790,41 @@ const data: Year = {
         },
       ],
     },
+    {
+      number: 'GP',
+      title: {
+        en: 'Gracious Professionalism®',
+        fr: 'Gracious Professionalism',
+      },
+      position: {
+        top: 85,
+        left: 93,
+      },
+      tasks: [
+        {
+          options: [
+            {
+              title: {
+                en: 'Gracious Professionalism® displayed at the robot game table',
+                fr: 'Gracious Professionalism® displayed at the robot game table',
+              },
+              handle: 'm17_gracious_professionalism',
+              type: 'number',
+              max: 4,
+              min: 2,
+              points: 0,
+              labels: [
+                '',
+                '2 Developing',
+                '3 Accomplished',
+                '4 Exceeds',
+              ],
+              images: [],
+            },
+          ],
+        },
+      ],
+    },
   ],
 };
 
