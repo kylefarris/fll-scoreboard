@@ -9,8 +9,8 @@ const data: Year = {
     logo: '2024/logo.png',
     field: '2024/field.jpg',
     colors: {
-      main: '#ec1d27',
-      missions: '#007633',
+      main: '#3c8ba6',
+      missions: '#114a5d',
       scoring: '#ff007d',
       penalties: '#000',
     },
