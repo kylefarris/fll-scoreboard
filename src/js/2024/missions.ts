@@ -39,7 +39,7 @@ const data: Year = {
           options: [
             {
               title: {
-                en: 'Your robot and all your equipment fit completely in one launch area and are under a height limit of 12 in (305 mm)',
+                en: 'Your robot and all your equipment fit completely in one launch area and are under a height limit of 12 inches (305 mm)',
                 fr: 'Votre robot et tout votre équipement tiennent complètement dans une seule zone de lancement et leur hauteur est inférieure à la limite de 305 mm',
               },
               handle: 'm00_small_inspection_area',
