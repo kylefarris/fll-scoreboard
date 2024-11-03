@@ -1,0 +1,48 @@
+.is-authenticated {
+    .authentication-notice {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        height: 50px;
+        background-color: goldenrod;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+    .scoreboard__header {
+        top: 50px;
+    }
+
+    .scoreboard__grid {
+        margin: 160px auto 190px;
+
+        @media (min-width: 700px) and (max-width: 800px) {
+            margin-top: 200px;
+        }
+    
+        @media (max-width: 565px) {
+            margin-top: 215px;
+        }
+    }
+
+    .offline-error {
+        top: 100px;
+
+        @media (min-width: 700px) and (max-width: 800px) {
+            top: 150px;
+        }
+    
+        @media (max-width: 565px) {
+            top: 150px;
+        }
+    }
+
+    .sidenav {
+        top: 50px;
+    }
+}

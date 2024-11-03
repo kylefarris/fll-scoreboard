@@ -97,7 +97,20 @@ const years: YearLink[] = [
   },
 ];
 
+const { host } = window.location;
+let apiBaseUrl = 'http://localhost:5420';
+if (/calc.fllgameday.com/.test(host)) apiBaseUrl = 'https://api.fllgameday.com';
+
+interface GamedayCalcConfig {
+  apiBaseUrl: string,
+}
+
+const config = Object.freeze(<GamedayCalcConfig>{
+  apiBaseUrl,
+});
+
 export {
   texts,
   years,
+  config,
 };
