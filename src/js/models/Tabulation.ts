@@ -249,6 +249,7 @@ export default class Tabulation {
                 Tabulation.teams.unshift({ id: 0, name: '' });
                 
                 // Pre-choose team based on the code provided by the team (should be possible)
+                // biome-ignore lint/suspicious/noDoubleEquals: <explanation>
                 if (Tabulation.teams.some(v => v.id == Tabulation.commitForm.teamNumber)) {
                     console.log('Pre-selecting team: ', Tabulation.commitForm.teamNumber);
                     setTimeout(() => {
@@ -260,6 +261,7 @@ export default class Tabulation {
                         Tabulation.teams.map(v => v.id),
                         Tabulation.commitForm.teamNumber,
                         Tabulation.teams.some(v => v.id === Tabulation.commitForm.teamNumber),
+                        // biome-ignore lint/suspicious/noDoubleEquals: <explanation>
                         Tabulation.teams.some(v => v.id == Tabulation.commitForm.teamNumber)
                     );
                 }

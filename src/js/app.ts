@@ -2,8 +2,15 @@ import * as m from 'mithril';
 import StandaloneScoreboard from './components/StandaloneScoreboard';
 import CreditsPage from './components/CreditsPage';
 import BackupTabulationsPage from './components/BackupTabulationsPage';
-import {years} from './global';
+import { years } from './global';
 import Layout from './components/Layout';
+import identity from './models/Identity';
+
+declare global {
+  interface Window { identity: typeof identity }
+}
+
+window.identity = identity;
 
 require('materialize-css');
 
@@ -12,7 +19,7 @@ let lastPath = null;
 
 function createResolver(component, props = {}) {
   return {
-    onmatch(args, requestedPath) {
+    onmatch(_args, requestedPath) {
       const path = requestedPath.split('#')[0];
 
       // The lastPath check is necessary because Mithril reacts to every change of hash,
@@ -44,9 +51,15 @@ m.route.prefix = '';
 
 const routes = {
   '/': createResolver({
-    oninit() {
+    async oninit() {
       // Redirect to the first year automatically
       m.route.set(`/${years[0].data.meta.slug}`);
+
+      // Check for authenticated user
+      await identity.authenticate();
+      if (identity.isAuthenticated) {
+        identity.fetchEvents();
+      }
     },
     view() {
       return null;
@@ -56,7 +69,6 @@ const routes = {
   '/backups': createResolver(BackupTabulationsPage),
 };
 
-// biome-ignore lint/complexity/noForEach: <explanation>
 years.forEach(year => {
   routes[`/${year.data.meta.slug}`] = createResolver(StandaloneScoreboard, {
     key: year.data.meta.slug, // Prevent Mithril re-using a scoreboard and its scorer/hasher

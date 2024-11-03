@@ -1,7 +1,9 @@
 import * as m from 'mithril';
 import Link from './Link';
 import lang from '../helpers/lang';
-import {texts, years} from '../global';
+import { texts, years } from '../global';
+import identity from '../models/Identity';
+import icon from '../helpers/icon';
 
 export default class Menu implements m.ClassComponent {
   oncreate(vnode: m.VnodeDOM) {
@@ -25,6 +27,39 @@ export default class Menu implements m.ClassComponent {
         href: '/credits',
       }, 'Credits'),
       m('li.hr'),
+      (
+        identity.isAuthenticated ?
+          m('li', { className: 'welcome-msg' }, `Welcome ${identity.me.firstName}!`) :
+          null
+      ),
+      (identity.isAuthenticated ? 
+        m(
+          'li',
+          { className: 'logout-btn'},
+          [
+            m('a', {
+              href: 'http://localhost:5420/logout',
+              className: 'waves-effect',
+            }, [
+              'Logout',
+              icon('sign-out-alt'),
+            ]),
+          ]
+        ) :
+        m(
+          'li',
+          { className: 'login-btn'},
+          [
+            m('a', {
+              href: `http://localhost:5420/login/${btoa(`http://${window.location.host}`)}`,
+              className: 'waves-effect',
+            }, [
+              'Login',
+              icon('sign-in-alt'),
+          ]),
+          ]
+        )
+      ),
       m(
         'li',
         { className: 'restore-btn'},

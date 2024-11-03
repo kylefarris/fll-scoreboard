@@ -251,6 +251,33 @@ li.hr {
 }
 
 .sidenav {
+    li.welcome-msg {
+        padding-top: 5px;
+        text-align: center;
+        margin: 0px;
+    }
+    li.logout-btn,
+    li.login-btn {
+        padding: 5px;
+        text-align: center;
+        background: #0791ef;
+        margin: 15px;
+        border-radius: 10px;
+        margin-bottom: 0px;
+
+        > a {
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+
+            > i {
+                float: none;
+                margin-left: 5px;
+                margin-right: 0px;
+                color: white;
+            }
+        }
+    }
     li.restore-btn {
         padding: 5px;
         text-align: center;
@@ -275,7 +302,15 @@ li.hr {
     text-align: center;
     font-weight: bold;
     padding: 10px 0px;
-    z-index: 1000;
+    z-index: 998;
+
+    @media (min-width: 700px) and (max-width: 800px) {
+        top: 100px;
+    }
+
+    @media (max-width: 565px) {
+        top: 100px;
+    }
 
     a:link, a:visited {
         color: white;
