@@ -7,7 +7,7 @@ export default class AuthBanner implements m.ClassComponent {
             
           }, [
             `Welcome ${identity.me.firstName}! `,
-            identity.chosenEvent ? `You are refereeing ${identity.chosenEvent.name}.` : identity.eventsFetchError,
+            identity.chosenEvent ? `You are refereeing ${identity.chosenEvent.name}.` : identity.errorMsg,
           ]
         );
     }
