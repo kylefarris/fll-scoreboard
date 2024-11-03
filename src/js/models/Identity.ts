@@ -105,7 +105,7 @@ class Identity {
         try {
             const result: GamedayEvent = await m.request({
                 method: 'GET',
-                url:`${config.apiBaseUrl}/me/referee-events`,
+                url:`${config.apiBaseUrl}/tabulation/referee-events`,
                 responseType: 'json',
                 withCredentials: true,
             });
