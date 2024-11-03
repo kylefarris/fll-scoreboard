@@ -69,6 +69,7 @@ const routes = {
   '/backups': createResolver(BackupTabulationsPage),
 };
 
+// biome-ignore lint/complexity/noForEach: <explanation>
 years.forEach(year => {
   routes[`/${year.data.meta.slug}`] = createResolver(StandaloneScoreboard, {
     key: year.data.meta.slug, // Prevent Mithril re-using a scoreboard and its scorer/hasher

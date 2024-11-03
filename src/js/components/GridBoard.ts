@@ -6,6 +6,7 @@ import CommitForm from './CommitForm';
 import Tabulation from '../models/Tabulation';
 import trans from '../helpers/trans';
 import NoEquipmentIndicator from './NoEquipmentIndicator';
+import identity from '../models/Identity';
 
 interface GridBoardAttrs {
   data: Year
@@ -59,7 +60,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
         mission.constraints ? m('.constraints', m('ul.browser-default', mission.constraints.map(constraint => m('li', trans(constraint))))) : null,
       ];
     }),
-    m(CommitForm, { score, missions, scorer }),
+    (identity.isAuthenticated ? m(CommitForm, { score, missions, scorer }) : null),
     );
   }
 }

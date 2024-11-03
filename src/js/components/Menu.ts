@@ -60,15 +60,19 @@ export default class Menu implements m.ClassComponent {
           ]
         )
       ),
-      m(
-        'li',
-        { className: 'restore-btn'},
-        [
-          m(m.route.Link, {
-            href: '/backups',
-            className: 'waves-effect',
-          }, 'View Stored Backups'),
-        ]
+      (
+        identity.isAuthenticated ? 
+          m(
+            'li',
+            { className: 'restore-btn'},
+            [
+              m(m.route.Link, {
+                href: '/backups',
+                className: 'waves-effect',
+              }, 'View Stored Backups'),
+            ]
+          ) :
+          null
       ),
       m('li.expand'),
       Object.keys(texts.locales).map(
