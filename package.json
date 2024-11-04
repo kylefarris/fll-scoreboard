@@ -20,8 +20,11 @@
         "@fortawesome/fontawesome-free": "^5.10",
         "@types/materialize-css": "^1.0",
         "@types/mithril": "^2.0",
+        "material-icons": "^1.13.12",
         "materialize-css": "^1.0",
-        "mithril": "^2.0"
+        "mithril": "^2.0",
+        "mithril-materialized": "^1.2.2",
+        "sweetalert": "^2.1.2"
     },
     "devDependencies": {
         "@types/jasmine": "^3.4.0",

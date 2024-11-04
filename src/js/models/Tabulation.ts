@@ -213,6 +213,10 @@ export default class Tabulation {
         }
     }
 
+    static async createNewTabulation(teamId: string, matchId: string) {
+        
+    }
+
     static resetCommitForm() {
         Tabulation.commitForm.teamNumber = null;
         Tabulation.commitForm.teamMemberInitials = '';

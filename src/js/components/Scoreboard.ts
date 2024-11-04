@@ -1,4 +1,5 @@
 import * as m from 'mithril';
+import { ModalPanel, Select, type ISelectOptions, type IInputOption } from 'mithril-materialized';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
 import OverlayMission from './OverlayMission';
@@ -8,10 +9,12 @@ import {texts} from '../global';
 import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import GridBoard from './GridBoard';
 import Tabulation from '../models/Tabulation';
+import identity from '../models/Identity';
 
 export interface ScoreboardAttrs {
   missions: MissionObject
   data: Year
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   scorer: AbstractScorer<MissionObject, any>
 }
 
@@ -59,11 +62,16 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
     this.focused_mission = newIndex;
   }
 
+  showCreateNewMatch() {
+    alert('Working!');
+  }
+
   view(vnode: m.Vnode<ScoreboardAttrs>) {
     const {missions, data, scorer} = vnode.attrs;
     const output = scorer.computeMissions(missions);
     const score = output.score;
 
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const style: any = {
       '--challenge-main-color': data.meta.colors.main,
       '--challenge-missions-color': data.meta.colors.missions,
@@ -78,6 +86,50 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
     return m('div', {
       style,
     }, [
+      m(ModalPanel, {
+        id: 'new-match-modal',
+        title: 'Start Tabulation of a New Match',
+        description: m(
+          '.row', // So the content has enough vertical space
+          [
+            m(Select, {
+              dropdownOptions: { container: document.body }, // So the select is not hidden
+              placeholder: 'Choose a Team to Score',
+              id: 'new-team-id',
+              isMandatory: true,
+              options: identity.teams.map(v => ({ id: v.id, label: v.prettyName })),
+              onchange: null,
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            } as ISelectOptions<any>),
+            m(Select, {
+              dropdownOptions: { container: document.body }, // So the select is not hidden
+              placeholder: 'Choose Match to Score',
+              id: 'new-match-id',
+              isMandatory: true,
+              options: [
+                { id: 'practice', label: 'Practice' },
+                { id: 'match1', label: 'Match 1' },
+                { id: 'match2', label: 'Match 2' },
+                { id: 'match3', label: 'Match 3' },
+                { id: 'tieBreaker', label: 'Tie Breaker' },
+              ],
+              onchange: null,
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            } as ISelectOptions<any>),
+          ]
+        ),
+        options: { opacity: 0.7 },
+        buttons: [
+          { label: 'Cancel', },
+          { label: 'Create', onclick: (e) =>  {
+            e.preventDefault();
+            const teamId = (<HTMLSelectElement>document.getElementById('new-team-id')).value;
+            const matchId = (<HTMLSelectElement>document.getElementById('new-match-id')).value;
+
+            Tabulation.createNewTabulation(teamId, matchId);
+          }},
+        ],
+      }),
       m('header.scoreboard__header', [
         m('i.header-block.fas.fa-bars.sidenav-trigger', {
           'data-target': 'menu',
@@ -87,10 +139,18 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           alt: `${data.meta.title} season logo`,
         }),
         m('.header-block.score', `Score: ${score}`),
-        m('h1..scoreboard__header__title.header-block', [
-          m('em', 'FLL Gameday'),
-          ' Calculator',
-        ]),
+        (
+          identity.isAuthenticated ?
+            m(
+              'button.start_new_tabulation.header-block',
+              { className: 'modal-trigger', href: "#new-match-modal" },
+              [icon('plus-square'), 'New Match']
+            ) :
+            m(
+              'h1.scoreboard__header__title.header-block',
+              [m('em', 'FLL Gameday'), ' Calculator']
+            )
+        ),
         m('.overlay-nav', {
           className: this.focused_mission !== -1 ? ' active' : '',
         }, [
@@ -172,6 +232,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         scorer,
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
+        showCreateNewMatch: this.showCreateNewMatch.bind(this),
       }),
       m('.scoreboard__overlay', {
         className: this.focused_mission !== -1 ? ' --open' : '',

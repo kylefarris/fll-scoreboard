@@ -1,5 +1,8 @@
 import * as m from 'mithril';
 import { config } from '../global';
+// import swal from 'sweetalert';
+
+declare const swal: (options: object) => void; 
 
 export interface Role {
     id: string,
@@ -36,6 +39,7 @@ export interface Me {
 export interface EventTeam {
     id: string,
     name: string,
+    prettyName: string,
     customTeamId: string,
 };
 
@@ -56,6 +60,7 @@ class Identity {
     isAuthenticated: boolean;
     me: Me;
     events: Array<GamedayEvent>;
+    teams: Array<EventTeam>;
     noEvents: boolean;
     errorMsg: string;
     chosenEvent: GamedayEvent;
@@ -115,18 +120,31 @@ class Identity {
                 this.noEvents = false;
                 
                 // If there is only one event in the list occurs today, set that one as the "chosen" event
-                if (result.length === 1) this.chosenEvent = this.events[0];
+                if (result.length === 1) {
+                    this.chosenEvent = this.events[0];
+
+                    // And fetch all teams for that event
+                    this.teams = await m.request({
+                        method: 'GET',
+                        url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
+                        responseType: 'json',
+                        withCredentials: true,
+                    });
+                }
+
             } else if (Array.isArray(result) && result.length === 0) {
                 this.noEvents = true;
             }
         } catch (err) {
             this.handleErrors(err);
-            // console.log('Error: ', { message: err.response.detail, code: err.code });
-            // console.log('Oops...', err);
-            // this.eventsFetchError = err.replace('Error:', '').trim();
         }
     }
 
+    /**
+     * Figures out how to handle errors send from the API server.
+     *
+     * @param {Error} err - The error to handle
+     */
     handleErrors(err) {
         if (err?.code) {
             switch (err.code) {
@@ -140,6 +158,21 @@ class Identity {
                     break;
             }
         }
+
+        // If we have an error message, show it in our pop-up
+        if (this.errorMsg) {
+            swal({
+                text: this.errorMsg,
+                icon: 'error',
+                button: {
+                    text: 'OK',
+                    value: true,
+                    visible: true,
+                    className: "ok-btn",
+                    closeModal: true,
+                  }
+            });
+        }
     }
 
     reset() {
@@ -147,6 +180,7 @@ class Identity {
         this.noEvents = null;
         this.errorMsg = null;
         this.events = [];
+        this.teams = [];
         this.chosenEvent = null;
         this.me = {
             id: '',
