@@ -13,8 +13,10 @@ interface GridBoardAttrs {
   score: number,
   missions: MissionObject
   focused_mission: number
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   scorer: AbstractScorer<MissionObject, any>
   focusMission: (mission: number) => void
+  showCreateNewMatch: () => void
 }
 
 export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {

@@ -321,3 +321,26 @@ li.hr {
         color: yellow;
     }
 }
+
+button.start_new_tabulation {
+    background-color: #2dc43a;
+    flex-grow: 1;
+    display: flex !important;
+    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.swal-modal {
+    .swal-footer {
+        text-align: center;
+    }
+    .ok-btn {
+        background-color: #333333;
+    }
+
+    .swal-button:not([disabled]):hover {
+        background-color: #111111;
+    }
+}
