@@ -57,9 +57,6 @@ const routes = {
 
       // Check for authenticated user
       await identity.authenticate();
-      if (identity.isAuthenticated) {
-        identity.fetchEvents();
-      }
     },
     view() {
       return null;
@@ -69,12 +66,11 @@ const routes = {
   '/backups': createResolver(BackupTabulationsPage),
 };
 
-// biome-ignore lint/complexity/noForEach: <explanation>
-years.forEach(year => {
+for (const year of years) {
   routes[`/${year.data.meta.slug}`] = createResolver(StandaloneScoreboard, {
     key: year.data.meta.slug, // Prevent Mithril re-using a scoreboard and its scorer/hasher
     ...year,
   });
-});
+}
 
 m.route(root, '/', routes);

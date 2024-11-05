@@ -8,7 +8,7 @@ import Configuration from '../utils/Configuration';
 import {texts} from '../global';
 import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
 import GridBoard from './GridBoard';
-import Tabulation from '../models/Tabulation';
+import scorecard from '../models/Scorecard';
 import identity from '../models/Identity';
 
 export interface ScoreboardAttrs {
@@ -22,6 +22,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
   focused_mission = -1
   missionsCount: number
   gridMode = false
+  scorecard: typeof scorecard;
 
   oninit(vnode: m.Vnode<ScoreboardAttrs>) {
     // Need to copy this value because it will be used in a callback without access to vnode
@@ -116,6 +117,15 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
               onchange: null,
             // biome-ignore lint/suspicious/noExplicitAny: <explanation>
             } as ISelectOptions<any>),
+            m(Select, {
+              dropdownOptions: { container: document.body }, // So the select is not hidden
+              placeholder: "Choose the Table  You're At",
+              id: 'new-table-id',
+              isMandatory: true,
+              options: identity.tables.map(v => ({ id: v.id, label: v.name })),
+              onchange: null,
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            } as ISelectOptions<any>),
           ]
         ),
         options: { opacity: 0.7 },
@@ -125,8 +135,9 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
             e.preventDefault();
             const teamId = (<HTMLSelectElement>document.getElementById('new-team-id')).value;
             const matchId = (<HTMLSelectElement>document.getElementById('new-match-id')).value;
+            const tableId = (<HTMLSelectElement>document.getElementById('new-table-id')).value;
 
-            Tabulation.createNewTabulation(teamId, matchId);
+            scorecard.init(teamId, matchId, tableId);
           }},
         ],
       }),
@@ -140,7 +151,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         }),
         m('.header-block.score', `Score: ${score}`),
         (
-          identity.isAuthenticated ?
+          identity.isAuthenticated && identity.chosenEvent ?
             m(
               'button.start_new_tabulation.header-block',
               { className: 'modal-trigger', href: "#new-match-modal" },
@@ -203,14 +214,14 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         }
       )),
       m('.offline-error', {
-        style: `visibility: ${Tabulation.noWifi ? 'visible' : 'hidden'}`
+        style: `visibility: ${scorecard.noWifi ? 'visible' : 'hidden'}`
       }, [
         m('span', 'No Internet Connectivity! Local Save Mode Only! '),
         m('a', {
           href: '#',
           async onclick(e) {
             e.preventDefault();
-            const result = await Tabulation.checkConnectivity();
+            const result = await scorecard.checkConnectivity();
             if (result) {
               M.toast({
                 html: 'Connection Restored!',
@@ -247,14 +258,13 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
       m('.tools', [
         m('button.btn.btn-larger', {
           onclick() {
-            if (confirm('Are you sure you want to start over??')) {
+            if (window.confirm('Are you sure you want to start over??')) {
               const initial = scorer.initialMissionsState();
-              // biome-ignore lint/complexity/noForEach: <explanation>
-              Object.keys(initial).forEach(key => {
+              for (const key in initial) {
                 missions[key] = initial[key];
-              });
+              }
 
-              Tabulation.resetCommitForm();
+              scorecard.reset();
             }
           },
         }, [

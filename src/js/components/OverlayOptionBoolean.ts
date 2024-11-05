@@ -2,7 +2,7 @@ import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
-import Tabulation from '../models/Tabulation';
+import Tabulation from '../models/Scorecard';
 import {texts} from '../global';
 import type {MissionObject, Option, Task} from '../interfaces/ChallengeYear';
 

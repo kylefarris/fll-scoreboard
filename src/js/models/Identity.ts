@@ -1,5 +1,6 @@
 import * as m from 'mithril';
 import { config } from '../global';
+import GamedayModel from './GamedayModel';
 // import swal from 'sweetalert';
 
 declare const swal: (options: object) => void; 
@@ -32,6 +33,7 @@ export interface Me {
     firstName: string,
     impersonation: Me,
     lastName: string,
+    name: string,
     roles: Array<UserRole>,
     verified: boolean,
 };
@@ -56,16 +58,23 @@ export interface GamedayEvent {
     active: boolean,
 };
 
-class Identity {
+export interface Table {
+    id: string,
+    name: string,
+}
+
+class Identity extends GamedayModel {
     isAuthenticated: boolean;
     me: Me;
     events: Array<GamedayEvent>;
     teams: Array<EventTeam>;
+    tables: Array<Table>;
     noEvents: boolean;
     errorMsg: string;
     chosenEvent: GamedayEvent;
 
     constructor() {
+        super();
         this.reset();
     }
 
@@ -91,10 +100,12 @@ class Identity {
                     firstName: result.firstName,
                     impersonation: result.impersonation,
                     lastName: result.lastName,
+                    name: `${result.firstName} ${result.lastName}`.trim(),
                     roles: result.roles,
                     verified: result.verified,
                 }
                 this.isAuthenticated = true;
+                this.fetchEvents();
             }
         } catch (_err) {
             this.isAuthenticated = false;
@@ -123,13 +134,24 @@ class Identity {
                 if (result.length === 1) {
                     this.chosenEvent = this.events[0];
 
-                    // And fetch all teams for that event
-                    this.teams = await m.request({
-                        method: 'GET',
-                        url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
-                        responseType: 'json',
-                        withCredentials: true,
-                    });
+                    // And fetch all teams & tables for that event
+                    const [teams, tables] = await Promise.all([
+                        m.request<Array<EventTeam>>({
+                            method: 'GET',
+                            url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
+                            responseType: 'json',
+                            withCredentials: true,
+                        }),
+                        m.request<Array<Table>>({
+                            method: 'GET',
+                            url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/tables`,
+                            responseType: 'json',
+                            withCredentials: true,
+                        }),
+                    ]);
+                    
+                    this.teams = teams;
+                    this.tables = tables;
                 }
 
             } else if (Array.isArray(result) && result.length === 0) {
@@ -181,6 +203,7 @@ class Identity {
         this.errorMsg = null;
         this.events = [];
         this.teams = [];
+        this.tables = [];
         this.chosenEvent = null;
         this.me = {
             id: '',
@@ -190,6 +213,7 @@ class Identity {
             lastName: '',
             roles: [],
             verified: null,
+            name: '',
         };
     }
 };
