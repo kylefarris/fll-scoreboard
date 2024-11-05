@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import trans from '../helpers/trans';
-import Tabulation from '../models/Tabulation';
+import Tabulation from '../models/Scorecard';
 import type {MissionObject, Option} from '../interfaces/ChallengeYear';
 
 interface OverlayOptionNumberAttrs {

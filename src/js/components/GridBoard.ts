@@ -1,9 +1,9 @@
 import * as m from 'mithril';
 import OverlayOptionBoolean from './OverlayOptionBoolean';
 import OverlayOptionNumber from './OverlayOptionNumber';
-import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
+import type { AbstractScorer, MissionObject, Year } from '../interfaces/ChallengeYear';
 import CommitForm from './CommitForm';
-import Tabulation from '../models/Tabulation';
+import scorecard from '../models/Scorecard';
 import trans from '../helpers/trans';
 import NoEquipmentIndicator from './NoEquipmentIndicator';
 import identity from '../models/Identity';
@@ -29,7 +29,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
       return [
         m('.scoreboard__grid__mission',
           {
-            style: `display: ${mission.number === 'GP' && Tabulation.commitForm.scoreLocked ? 'none' : 'block'};`,
+            style: `display: ${mission.number === 'GP' && scorecard.commitForm.scoreLocked ? 'none' : 'block'};`,
           },
           [
             mission.no_equipment_constraint ? m(NoEquipmentIndicator) : null,
@@ -44,7 +44,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
         ),
         mission.tasks.map(task => task.options.map((option, optionIndex) => m(`.scoreboard__grid__option${optionIndex > 0 ? '.part-of-previous-task' : ''}`,
         {
-          style: `display: ${mission.number === 'GP' && Tabulation.commitForm.scoreLocked ? 'none' : 'flex'};`,
+          style: `display: ${mission.number === 'GP' && scorecard.commitForm.scoreLocked ? 'none' : 'flex'};`,
         },
         [
           m('div', trans(option.title)),
@@ -62,7 +62,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
         mission.constraints ? m('.constraints', m('ul.browser-default', mission.constraints.map(constraint => m('li', trans(constraint))))) : null,
       ];
     }),
-    (identity.isAuthenticated ? m(CommitForm, { score, missions, scorer }) : null),
+    (identity.isAuthenticated && identity.chosenEvent ? m(CommitForm, { score, missions, scorer }) : null),
     );
   }
 }

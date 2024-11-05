@@ -4,6 +4,7 @@ import lang from '../helpers/lang';
 import { texts, years } from '../global';
 import identity from '../models/Identity';
 import icon from '../helpers/icon';
+import { config } from '../global';
 
 export default class Menu implements m.ClassComponent {
   oncreate(vnode: m.VnodeDOM) {
@@ -51,7 +52,7 @@ export default class Menu implements m.ClassComponent {
           { className: 'login-btn'},
           [
             m('a', {
-              href: `http://localhost:5420/login/${btoa(`http://${window.location.host}`)}`,
+              href: `${config.apiBaseUrl}/login/${btoa(`http://${window.location.host}`)}`,
               className: 'waves-effect',
             }, [
               'Login',

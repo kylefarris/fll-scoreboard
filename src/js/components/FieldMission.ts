@@ -1,6 +1,6 @@
 import * as m from 'mithril';
 import trans from '../helpers/trans';
-import {Mission, MissionObject} from '../interfaces/ChallengeYear';
+import type { Mission, MissionObject } from '../interfaces/ChallengeYear';
 
 interface FieldMissionAttrs {
   key: number

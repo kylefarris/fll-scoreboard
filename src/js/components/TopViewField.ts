@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import Configuration from '../utils/Configuration';
 import FieldMission from './FieldMission';
-import {MissionObject, Year} from '../interfaces/ChallengeYear';
+import type { MissionObject, Year } from '../interfaces/ChallengeYear';
 
 interface TopViewFieldAttrs {
   data: Year
@@ -17,7 +17,7 @@ export default class TopViewField implements m.ClassComponent<TopViewFieldAttrs>
     return m('.scoreboard__field', {
       className: focused_mission !== -1 ? ' --overlay-open' : '',
       style: {
-        backgroundImage: 'url(' + Configuration.imagePath + data.meta.field + ')',
+        backgroundImage: `url(${Configuration.imagePath}${data.meta.field})`,
       },
     }, data.missions.map((mission, key) => m(FieldMission, {
       mission,

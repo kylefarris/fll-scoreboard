@@ -11,7 +11,7 @@ export default class OverlayImageGallery implements m.ClassComponent<OverlayImag
       (image, key) => m('.image', {
         key,
         style: {
-          backgroundImage: 'url(' + Configuration.imagePath + image + ')',
+          backgroundImage: `url(${Configuration.imagePath}${image})`,
         },
       })
     ));

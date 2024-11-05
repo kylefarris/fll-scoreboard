@@ -1,5 +1,5 @@
 import * as m from 'mithril';
-import Tabulation from '../models/Tabulation';
+import scorecard from '../models/Scorecard';
 import { NumericHashReader } from '../utils/NumericHashReader';
 import { years } from '../global';
 
@@ -51,7 +51,7 @@ export default class BackupTabulationsPage implements m.ClassComponent {
                     href: `/${seasonName.toLowerCase() ?? `${years[0].data.meta.slug}`}#${scoreHash}`,
                     className: 'waves-effect',
                     onclick() {
-                      Tabulation.commitForm = tab.commitForm;
+                      scorecard.commitForm = tab.commitForm;
                     }
                   },
                   `${tab.teamName} - ${tab.matchName}`
