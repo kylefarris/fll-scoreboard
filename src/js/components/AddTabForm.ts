@@ -1,4 +1,5 @@
 import * as m from "mithril";
+import type { MissionObject } from '../interfaces/ChallengeYear';
 import {
     ModalPanel,
     Select,
@@ -7,9 +8,17 @@ import {
 import scorecard from "../models/Scorecard";
 import identity from "../models/Identity";
 
-export default class StartTabForm implements m.ClassComponent {
-    oninit(vnode: m.Vnode) {}
-    view(vnode: m.Vnode) {
+interface StartTabFormAttrs {
+    missions: MissionObject
+}
+
+export default class StartTabForm implements m.ClassComponent<StartTabFormAttrs> {
+    oninit(vnode: m.Vnode<StartTabFormAttrs, this>) {
+        const { missions } = vnode.attrs;
+    }
+    view(vnode: m.Vnode<StartTabFormAttrs, this>) {
+        const { missions } = vnode.attrs;
+
         return m(ModalPanel, {
             id: "new-match-modal",
             title: "Start Tabulation of a New Match",
@@ -85,7 +94,7 @@ export default class StartTabForm implements m.ClassComponent {
                             document.getElementById("referee-id")
                         )).value;
 
-                        scorecard.init(teamId, matchId, tableId, refereeId);
+                        scorecard.init(teamId, matchId, tableId, refereeId, missions);
                     },
                 },
             ],

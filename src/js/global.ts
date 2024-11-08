@@ -54,7 +54,7 @@ const texts = {
   },
 };
 
-interface YearLink {
+export interface YearLink {
   scorer: AbstractScorer<MissionObject, any>
   data: Year
 }

@@ -82,7 +82,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
     return m('div', {
       style,
     }, [
-      m(AddTabForm),
+      m(AddTabForm, { missions }),
       m('header.scoreboard__header', [
         m('i.header-block.fas.fa-bars.sidenav-trigger', {
           'data-target': 'menu',
