@@ -128,6 +128,11 @@ export interface RefValidationResult {
     valid: boolean,
 }
 
+export interface MatchOption {
+    id: string,
+    label: string,
+}
+
 class Scorecard extends GamedayModel {
     public committing: boolean;
     public refError: string;
@@ -139,6 +144,7 @@ class Scorecard extends GamedayModel {
     public matchId: string;
     public tableId: string;
     public refereeId: string;
+    public teamMatches: MatchOption[];
 
     constructor() {
         super();
@@ -279,6 +285,31 @@ class Scorecard extends GamedayModel {
     }
 
     /**
+     * Get a dropdown-compatible list of all matches that a team has not yet already
+     * had a fully-submitted tabulation record for.
+     *
+     * @public
+     * @async
+     * @param {string} eventTeamId - ID of gthe event Team to get get matches of
+     * @returns {Promise<MatchOption[]>} Dropdown-compatible list of matches a team can be scored on
+     */
+    public async getTeamMatches(eventTeamId): Promise<MatchOption[]> {
+        const teamMatches: [] = await m.request({
+            method: 'GET',
+            url: `${config.apiBaseUrl}/tabulation/${eventTeamId}/unscored-matches`,
+            responseType: 'json',
+            withCredentials: true,
+        });
+
+        this.teamMatches = teamMatches.map((v) => ({
+            id: config.matchTypesInverted[v],
+            label: v
+        }));
+
+        return this.teamMatches;
+    }
+
+    /**
      * Resets the current scorecard by fetching an instance from the server. The 
      * tabulation instance from the server could be a new/fresh scorecard or could
      * be one that was already started.
@@ -403,6 +434,7 @@ class Scorecard extends GamedayModel {
         this.eventTeamId = null;
         this.matchId = null;
         this.tableId = null;
+        this.teamMatches = [];
         this.tabulation = {
             id: null,
             EventTeam: null,

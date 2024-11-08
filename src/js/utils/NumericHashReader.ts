@@ -43,6 +43,6 @@ export class NumericHashReader {
       const value = missions[mission.key];
 
       return mission.type === 'number' ? value : (value ? 1 : 0);
-    }).join('');
+    })?.join('') ?? '';
   }
 }
