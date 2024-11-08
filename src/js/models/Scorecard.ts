@@ -1,9 +1,10 @@
 import * as m from 'mithril';
 import { NumericHashReader } from '../utils/NumericHashReader';
 import { config, years } from '../global';
+import type { YearLink } from '../global';
 import GamedayModel from './GamedayModel';
 import identity from './Identity';
-import type {AbstractScorer, Mission, MissionObject, Year} from '../interfaces/ChallengeYear';
+import type {AbstractScorer, Mission, MissionObject } from '../interfaces/ChallengeYear';
 
 const runNameMapping = {
     match1: 'Match 1',
@@ -159,6 +160,7 @@ class Scorecard extends GamedayModel {
     public  cancelTabulation(scorer: AbstractScorer<MissionObject, any>, missions: MissionObject): void {
         if (window.confirm('Are you sure you want to cancel this match? You can continue where you left off by restarting it later.')) {
             this.reset();
+
             const initial = scorer.initialMissionsState();
             for (const key in initial) {
                 missions[key] = initial[key];
@@ -286,7 +288,7 @@ class Scorecard extends GamedayModel {
      * @param {string} tableId - ID of the table the match is being held at
      * @param {string} refereeId - ID of the referee doing the scoring
      */
-    public async init(eventTeamId: string, matchId: string, tableId: string, refereeId: string) {
+    public async init(eventTeamId: string, matchId: string, tableId: string, refereeId: string, missions: MissionObject) {
         try {
             if (!eventTeamId) throw new Error('No team selected!');
             if (!matchId) throw new Error('No match selected!');
@@ -308,6 +310,20 @@ class Scorecard extends GamedayModel {
                 this.tableId = tableId;
                 this.refereeId = refereeId;
 
+                // The order of keys gets messed up in the database when stored so we need to make sure
+                // they are correct again for the chosen season.
+                const seasonYear: YearLink = years.find(v => v.data.meta.slug === result.EventTeam.Event.Season.name.toLocaleLowerCase());
+                const seasonMissions = seasonYear.scorer.initialMissionsState();
+                const missionKeys = Object.keys(seasonMissions);
+                const missionMap = new Map();
+                
+                for (const missionKey of missionKeys) {
+                    const value = missionKey in result.tab ? result.tab[missionKey] : seasonMissions[missionKey];
+                    missionMap.set(missionKey, value);
+                }
+
+                const fixedTabulation = Object.fromEntries(missionMap);
+
                 this.tabulation = {
                     id: result.id,
                     EventTeam: result.EventTeam,
@@ -319,7 +335,7 @@ class Scorecard extends GamedayModel {
                     scoreApproved: result.scoreApproved,
                     teamMemberInitials: result.teamMemberInitials,
                     teamNumber: result.teamNumber,
-                    tab: result.tab,
+                    tab: fixedTabulation,
                     createdAt: result.createdAt,
                     updatedAt: result.updatedAt,
                 };
@@ -330,15 +346,19 @@ class Scorecard extends GamedayModel {
                     refCode: '',
                     score: result.score ?? 50,
                     gpScore: result.gpScore ?? 3,
-                    missions: result.tab,
+                    missions: fixedTabulation,
                     scoreLocked: false,
                 }
 
+                // Set the page hash to store the scoring state
                 const hashReader = new NumericHashReader(this.commitForm.missions);
                 const scoreHash = hashReader.encode(this.commitForm.missions);
-
                 location.hash = `#${scoreHash}`;
 
+                // Update the state of each mission based on our stored or initial tabulation
+                for (const attr in this.commitForm.missions) {
+                    missions[attr] = this.commitForm.missions[attr];
+                }
             } else {
                 throw new Error('Could not initialize new match.');
             }
