@@ -2,7 +2,8 @@ import * as m from 'mithril';
 
 interface LinkAttrs {
     href: string
-  }
+    class: string
+}
 
 export default class Link implements m.ClassComponent<LinkAttrs> {
     view(vnode: m.Vnode<LinkAttrs>) {
@@ -12,7 +13,7 @@ export default class Link implements m.ClassComponent<LinkAttrs> {
             className: currentPathWithoutHash === vnode.attrs.href ? ' active' : '',
         }, m(m.route.Link, {
             href: vnode.attrs.href,
-            className: 'waves-effect',
+            className: `waves-effect${vnode.attrs.class ? ` ${vnode.attrs.class}` : ''}`,
         }, vnode.children));
     }
 }

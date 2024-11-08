@@ -8,11 +8,11 @@ import identity from './models/Identity';
 import scorecard from './models/Scorecard';
 
 declare global {
-  interface Window { scorecard: typeof scorecard }
+  interface Window { identity: typeof identity }
 }
 
-// window.identity = identity;
-window.scorecard = scorecard;
+window.identity = identity;
+// window.scorecard = scorecard;
 
 require('materialize-css');
 

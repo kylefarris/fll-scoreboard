@@ -1,4 +1,5 @@
-import type {AbstractScorer, MissionObject, Year} from './interfaces/ChallengeYear';
+import type { AbstractScorer, MissionObject, Year } from './interfaces/ChallengeYear';
+import identity from './models/Identity';
 
 const texts = {
   locales: {
