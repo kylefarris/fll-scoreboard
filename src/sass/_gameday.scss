@@ -375,3 +375,15 @@ button#cancel_tabulation {
 .scoreboard__footer {
     visibility: hidden;
 }
+
+.input-field.select-space {
+    margin-top: 2rem;
+
+    label {
+        left: 0px;
+
+        span.mandatory {
+            margin-left: 0.5rem;
+        }
+    }
+}

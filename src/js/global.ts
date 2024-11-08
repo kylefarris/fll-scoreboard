@@ -102,12 +102,26 @@ const { host } = window.location;
 let apiBaseUrl = 'http://localhost:5420';
 if (/calc.fllgameday.com/.test(host)) apiBaseUrl = 'https://api.fllgameday.com';
 
+const matchTypes = {
+  match1: 'Match 1',
+  match2: 'Match 2',
+  match3: 'Match 3',
+  practice: 'Practice',
+  tieBreaker: 'Tie Breaker',
+};
+
+const matchTypesInverted = Object.fromEntries(Object.entries(matchTypes).map(a => a.reverse()));
+
 interface GamedayCalcConfig {
   apiBaseUrl: string,
+  matchTypes: typeof matchTypes,
+  matchTypesInverted: typeof matchTypesInverted,
 }
 
 const config = Object.freeze(<GamedayCalcConfig>{
   apiBaseUrl,
+  matchTypes,
+  matchTypesInverted,
 });
 
 export {
