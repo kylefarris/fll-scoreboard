@@ -2,3 +2,4 @@ node_modules/
 site/
 *~
 yarn-error.log
+.DS_Store

@@ -1,8 +1,7 @@
 import * as m from 'mithril';
 import { config } from '../global';
 import GamedayModel from './GamedayModel';
-import { EventVolunteer } from './Scorecard';
-// import swal from 'sweetalert';
+import type { EventVolunteer } from './Scorecard';
 
 declare const swal: (options: object) => void; 
 
@@ -46,12 +45,17 @@ export interface EventTeam {
     customTeamId: string,
 };
 
+export interface Season {
+    name: string,
+}
+
 export interface GamedayEvent {
     id: string,
     name: string,
     startDate: Date,
     endDate: Date,
     Teams: Array<EventTeam>,
+    Season: Season,
     isCurrent: boolean,
     isFuture: boolean,
     isPast: boolean,
@@ -70,6 +74,7 @@ export type Referee = {
 }
 
 class Identity extends GamedayModel {
+    authChecked: boolean;
     isAuthenticated: boolean;
     me: Me;
     events: Array<GamedayEvent>;
@@ -116,6 +121,10 @@ class Identity extends GamedayModel {
             }
         } catch (_err) {
             this.isAuthenticated = false;
+        } finally {
+            this.authChecked = true;
+            const footer: Partial<HTMLElement> = document.getElementsByClassName('scoreboard__footer')[0];
+            footer.style.visibility = 'visible';
         }
     }
 
@@ -140,6 +149,23 @@ class Identity extends GamedayModel {
                 // If there is only one event in the list that occurs today, set that one as the "chosen" event
                 if (result.length === 1) {
                     this.chosenEvent = this.events[0];
+
+                    // biome-ignore lint/complexity/noForEach: <explanation>
+                    Array.from(document.getElementsByClassName('year-link')).forEach((link: HTMLAnchorElement) => {
+                        // Hide all season's in the menu other than the one for this session
+                        const slug = link.href.split('/').pop();
+                        if (identity.chosenEvent.Season.name.toLowerCase() !== slug) {
+                            link.style.display = 'none';
+                        } else {
+                            link.style.display = 'block';
+                        }
+
+                        // If the season calculator isn't on the correct season URL already, make sure it is...
+                        const seasonSlug = identity.chosenEvent.Season.name.toLowerCase();
+                        if (window.location.pathname !== `/${seasonSlug}`) {
+                            m.route.set(`/${seasonSlug}`);
+                        }
+                    });
 
                     // And fetch all teams & tables for that event as well as the referee ID for the logged in user
                     // if that's available.
@@ -172,8 +198,9 @@ class Identity extends GamedayModel {
                     } else {
                         throw new Error('You are not a referee for this event!');
                     }
+                } else {
+                    // Future: Show some interface for them to choose an event they are scoring at
                 }
-
             } else if (Array.isArray(result) && result.length === 0) {
                 this.noEvents = true;
             }
@@ -218,6 +245,7 @@ class Identity extends GamedayModel {
     }
 
     reset() {
+        this.authChecked = false;
         this.isAuthenticated = false;
         this.noEvents = null;
         this.errorMsg = null;

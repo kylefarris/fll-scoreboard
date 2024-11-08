@@ -3,6 +3,7 @@ import { NumericHashReader } from '../utils/NumericHashReader';
 import { config, years } from '../global';
 import GamedayModel from './GamedayModel';
 import identity from './Identity';
+import type {AbstractScorer, Mission, MissionObject, Year} from '../interfaces/ChallengeYear';
 
 const runNameMapping = {
     match1: 'Match 1',
@@ -154,9 +155,15 @@ class Scorecard extends GamedayModel {
      * Allows a referee to cancel working on a specific tabulation for whatever reason.
      * Progress of the tabulation 
      */
-    public cancelTabulation(): void {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    public  cancelTabulation(scorer: AbstractScorer<MissionObject, any>, missions: MissionObject): void {
         if (window.confirm('Are you sure you want to cancel this match? You can continue where you left off by restarting it later.')) {
             this.reset();
+            const initial = scorer.initialMissionsState();
+            for (const key in initial) {
+                missions[key] = initial[key];
+            }
+            // window.history.pushState('', document.title, window.location.pathname);
         }
     }
 

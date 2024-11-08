@@ -97,7 +97,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
             (scorecard.tabulation.id ? 
               m(
                 'button#cancel_tabulation.header-block',
-                { onclick: () => scorecard.cancelTabulation() },
+                { onclick: () => scorecard.cancelTabulation(scorer, missions) },
                 [icon('window-close'), 'Cancel Match']
               ) :
               m(

@@ -23,9 +23,11 @@ export default class Menu implements m.ClassComponent {
     }, [
       years.map(year => m(Link, {
         href: `/${year.data.meta.slug}`,
+        class: 'year-link',
       }, `${year.data.meta.year} ${year.data.meta.title}`)),
       m(Link, {
         href: '/credits',
+        class: null,
       }, 'Credits'),
       m('li.hr'),
       (
