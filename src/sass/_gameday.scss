@@ -304,11 +304,7 @@ li.hr {
     padding: 10px 0px;
     z-index: 998;
 
-    @media (min-width: 700px) and (max-width: 800px) {
-        top: 100px;
-    }
-
-    @media (max-width: 565px) {
+    @media (max-width: 693px) {
         top: 100px;
     }
 
@@ -322,7 +318,7 @@ li.hr {
     }
 }
 
-button.start_new_tabulation {
+button#start_new_tabulation {
     background-color: #2dc43a;
     flex-grow: 1;
     display: flex !important;
@@ -343,4 +339,31 @@ button.start_new_tabulation {
     .swal-button:not([disabled]):hover {
         background-color: #111111;
     }
+}
+
+#no-match-started {
+    margin: 150px auto;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f9fcff;
+    width: calc(80vw - 16px);
+    border: 1px dashed #bbccdd;
+    border-radius: 10px;
+    color: #708499;
+    text-align: center;
+
+    @media (max-width: 693px) {
+        margin-top: 200px;
+    }
+}
+
+button#cancel_tabulation {
+    background-color: #c4462d;
+    flex-grow: 1;
+    display: flex !important;
+    gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }

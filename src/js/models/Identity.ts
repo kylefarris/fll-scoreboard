@@ -1,6 +1,7 @@
 import * as m from 'mithril';
 import { config } from '../global';
 import GamedayModel from './GamedayModel';
+import { EventVolunteer } from './Scorecard';
 // import swal from 'sweetalert';
 
 declare const swal: (options: object) => void; 
@@ -63,6 +64,11 @@ export interface Table {
     name: string,
 }
 
+export type Referee = {
+    id: string,
+    EventVolunteer: EventVolunteer,
+}
+
 class Identity extends GamedayModel {
     isAuthenticated: boolean;
     me: Me;
@@ -72,6 +78,7 @@ class Identity extends GamedayModel {
     noEvents: boolean;
     errorMsg: string;
     chosenEvent: GamedayEvent;
+    refereeId: string;
 
     constructor() {
         super();
@@ -130,12 +137,13 @@ class Identity extends GamedayModel {
                 this.events = result;
                 this.noEvents = false;
                 
-                // If there is only one event in the list occurs today, set that one as the "chosen" event
+                // If there is only one event in the list that occurs today, set that one as the "chosen" event
                 if (result.length === 1) {
                     this.chosenEvent = this.events[0];
 
-                    // And fetch all teams & tables for that event
-                    const [teams, tables] = await Promise.all([
+                    // And fetch all teams & tables for that event as well as the referee ID for the logged in user
+                    // if that's available.
+                    const [teams, tables, referee] = await Promise.all([
                         m.request<Array<EventTeam>>({
                             method: 'GET',
                             url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
@@ -144,14 +152,26 @@ class Identity extends GamedayModel {
                         }),
                         m.request<Array<Table>>({
                             method: 'GET',
-                            url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/tables`,
+                            url: `${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/tables`,
                             responseType: 'json',
                             withCredentials: true,
                         }),
+                        m.request<Referee>({
+                            method: 'GET',
+                            url: `${config.apiBaseUrl}/me/referee/${this.chosenEvent.id}`,
+                            responseType: 'json',
+                            withCredentials: true,
+                        })
                     ]);
                     
                     this.teams = teams;
                     this.tables = tables;
+
+                    if (referee?.id) {
+                        this.refereeId = referee.id;
+                    } else {
+                        throw new Error('You are not a referee for this event!');
+                    }
                 }
 
             } else if (Array.isArray(result) && result.length === 0) {
@@ -205,6 +225,7 @@ class Identity extends GamedayModel {
         this.teams = [];
         this.tables = [];
         this.chosenEvent = null;
+        this.refereeId = null;
         this.me = {
             id: '',
             email: '',

@@ -1,7 +1,7 @@
 import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import trans from '../helpers/trans';
-import Tabulation from '../models/Scorecard';
+import scorecard from '../models/Scorecard';
 import type {MissionObject, Option} from '../interfaces/ChallengeYear';
 
 interface OverlayOptionNumberAttrs {
@@ -90,9 +90,12 @@ export default class OverlayOptionNumber implements m.ClassComponent<OverlayOpti
         className: missions[option.handle] === number ? ' active' : '',
         onclick() {
           // Prevent if the scoring is locked by a ref
-          if (Tabulation.commitForm.scoreLocked) return false;
+          if (scorecard.commitForm.scoreLocked) return false;
 
           missions[option.handle] = number;
+
+          // Save progress after small delay to make sure score is calculated
+          setTimeout(scorecard.saveProgress.bind(scorecard), 300);
         },
       }, [
         option.colors_list ?

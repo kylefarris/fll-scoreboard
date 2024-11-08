@@ -2,7 +2,7 @@ import * as m from 'mithril';
 import OverlayImageGallery from './OverlayImageGallery';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
-import Tabulation from '../models/Scorecard';
+import scorecard from '../models/Scorecard';
 import {texts} from '../global';
 import type {MissionObject, Option, Task} from '../interfaces/ChallengeYear';
 
@@ -22,7 +22,7 @@ export default class OverlayOptionBoolean implements m.ClassComponent<OverlayOpt
         checked: missions[option.handle],
         onchange() {
           // Prevent if the scoring is locked by a ref
-          if (Tabulation.commitForm.scoreLocked) return false;
+          if (scorecard.commitForm.scoreLocked) return false;
 
           // We need to edit all the other options of that task,
           // switch the state of this option and disable all the others
@@ -34,6 +34,9 @@ export default class OverlayOptionBoolean implements m.ClassComponent<OverlayOpt
               missions[check_option.handle] = false;
             }
           });
+
+          // Save progress after small delay to make sure score is calculated
+          setTimeout(scorecard.saveProgress.bind(scorecard), 300);
         },
       }),
       m('.field-box.waves-effect', {

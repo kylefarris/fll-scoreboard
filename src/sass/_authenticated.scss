@@ -28,7 +28,7 @@
     .scoreboard__grid {
         margin: 160px auto 190px;
 
-        @media (min-width: 700px) and (max-width: 800px) {
+        @media (max-width: 693px) {
             margin-top: 200px;
         }
     
@@ -40,16 +40,16 @@
     .offline-error {
         top: 100px;
 
-        @media (min-width: 700px) and (max-width: 800px) {
-            top: 150px;
-        }
-    
-        @media (max-width: 565px) {
+        @media (max-width: 693px) {
             top: 150px;
         }
     }
 
     .sidenav {
         top: 50px;
+    }
+
+    .scoreboard__footer {
+        display: none;
     }
 }

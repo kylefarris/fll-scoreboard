@@ -5,17 +5,31 @@ import BackupTabulationsPage from './components/BackupTabulationsPage';
 import { years } from './global';
 import Layout from './components/Layout';
 import identity from './models/Identity';
+import scorecard from './models/Scorecard';
 
 declare global {
-  interface Window { identity: typeof identity }
+  interface Window { scorecard: typeof scorecard }
 }
 
-window.identity = identity;
+// window.identity = identity;
+window.scorecard = scorecard;
 
 require('materialize-css');
 
 let isFirstMatch = true;
 let lastPath = null;
+
+// Warn the user if the are refreshing/leaving the calculator when they have an
+// open/unsubmitted tabulation in progress.
+window.addEventListener('beforeunload', async (event) => {
+  event.preventDefault();
+  if (identity.isAuthenticated && scorecard.tabulation.id) {
+    if (confirm('Are you leave? You may lose un-submitted changes!')) {
+      await scorecard.saveProgress();
+      event.preventDefault();
+    }
+  }
+});
 
 function createResolver(component, props = {}) {
   return {

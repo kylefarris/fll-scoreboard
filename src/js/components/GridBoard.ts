@@ -3,10 +3,10 @@ import OverlayOptionBoolean from './OverlayOptionBoolean';
 import OverlayOptionNumber from './OverlayOptionNumber';
 import type { AbstractScorer, MissionObject, Year } from '../interfaces/ChallengeYear';
 import CommitForm from './CommitForm';
-import scorecard from '../models/Scorecard';
 import trans from '../helpers/trans';
 import NoEquipmentIndicator from './NoEquipmentIndicator';
 import identity from '../models/Identity';
+import scorecard from '../models/Scorecard';
 
 interface GridBoardAttrs {
   data: Year
@@ -16,12 +16,26 @@ interface GridBoardAttrs {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   scorer: AbstractScorer<MissionObject, any>
   focusMission: (mission: number) => void
-  showCreateNewMatch: () => void
 }
 
 export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
   view(vnode: m.Vnode<GridBoardAttrs>) {
-    const {data, missions, focused_mission, score, scorer, focusMission} = vnode.attrs;
+    const { data, missions, focused_mission, score, scorer, focusMission } = vnode.attrs;
+
+    // Only show the scoregrid if the user is not authenticated or the app is offline.
+    // or if they ARE authenticated and they have actually initialized a new tabulation.
+    // Otherwise show them a message informing them of what to do.
+    if (
+      identity.isAuthenticated && scorecard.tabulation.id === null
+    ) {
+      return m('div#no-match-started', [
+        m('span', [
+          'You must ',
+          m('a', { className: 'modal-trigger', href: "#new-match-modal" }, ['start a match']),
+          ' before you can score a team!'
+        ]),
+      ]);
+    }
 
     return m('.scoreboard__grid', {
       className: focused_mission !== -1 ? ' --overlay-open' : '',
