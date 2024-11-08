@@ -10,13 +10,6 @@ interface CommitFormAttrs {
   scorer: AbstractScorer<MissionObject, any>,
 }
 
-// function fail(msg) {
-//   M.toast({
-//     html: msg,
-//     classes: 'red text-white',
-//   });
-// }
-
 export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
   oninit(vnode: m.Vnode<CommitFormAttrs, this>) {
     const { score, missions } = vnode.attrs;

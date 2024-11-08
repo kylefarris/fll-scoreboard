@@ -1,9 +1,8 @@
 import * as m from 'mithril';
-import { ModalPanel, Select, type ISelectOptions, type IInputOption } from 'mithril-materialized';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
 import OverlayMission from './OverlayMission';
-// import TopViewField from './TopViewField';
+import AddTabForm from './AddTabForm';
 import Configuration from '../utils/Configuration';
 import {texts} from '../global';
 import type {AbstractScorer, MissionObject, Year} from '../interfaces/ChallengeYear';
@@ -63,12 +62,8 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
     this.focused_mission = newIndex;
   }
 
-  showCreateNewMatch() {
-    alert('Working!');
-  }
-
   view(vnode: m.Vnode<ScoreboardAttrs>) {
-    const {missions, data, scorer} = vnode.attrs;
+    const { missions, data, scorer } = vnode.attrs;
     const output = scorer.computeMissions(missions);
     const score = output.score;
 
@@ -87,60 +82,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
     return m('div', {
       style,
     }, [
-      m(ModalPanel, {
-        id: 'new-match-modal',
-        title: 'Start Tabulation of a New Match',
-        description: m(
-          '.row', // So the content has enough vertical space
-          [
-            m(Select, {
-              dropdownOptions: { container: document.body }, // So the select is not hidden
-              placeholder: 'Choose a Team to Score',
-              id: 'new-team-id',
-              isMandatory: true,
-              options: identity.teams.map(v => ({ id: v.id, label: v.prettyName })),
-              onchange: null,
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            } as ISelectOptions<any>),
-            m(Select, {
-              dropdownOptions: { container: document.body }, // So the select is not hidden
-              placeholder: 'Choose Match to Score',
-              id: 'new-match-id',
-              isMandatory: true,
-              options: [
-                { id: 'practice', label: 'Practice' },
-                { id: 'match1', label: 'Match 1' },
-                { id: 'match2', label: 'Match 2' },
-                { id: 'match3', label: 'Match 3' },
-                { id: 'tieBreaker', label: 'Tie Breaker' },
-              ],
-              onchange: null,
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            } as ISelectOptions<any>),
-            m(Select, {
-              dropdownOptions: { container: document.body }, // So the select is not hidden
-              placeholder: "Choose the Table  You're At",
-              id: 'new-table-id',
-              isMandatory: true,
-              options: identity.tables.map(v => ({ id: v.id, label: v.name })),
-              onchange: null,
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            } as ISelectOptions<any>),
-          ]
-        ),
-        options: { opacity: 0.7 },
-        buttons: [
-          { label: 'Cancel', },
-          { label: 'Create', onclick: (e) =>  {
-            e.preventDefault();
-            const teamId = (<HTMLSelectElement>document.getElementById('new-team-id')).value;
-            const matchId = (<HTMLSelectElement>document.getElementById('new-match-id')).value;
-            const tableId = (<HTMLSelectElement>document.getElementById('new-table-id')).value;
-
-            scorecard.init(teamId, matchId, tableId);
-          }},
-        ],
-      }),
+      m(AddTabForm),
       m('header.scoreboard__header', [
         m('i.header-block.fas.fa-bars.sidenav-trigger', {
           'data-target': 'menu',
@@ -152,10 +94,17 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         m('.header-block.score', `Score: ${score}`),
         (
           identity.isAuthenticated && identity.chosenEvent ?
-            m(
-              'button.start_new_tabulation.header-block',
-              { className: 'modal-trigger', href: "#new-match-modal" },
-              [icon('plus-square'), 'New Match']
+            (scorecard.tabulation.id ? 
+              m(
+                'button#cancel_tabulation.header-block',
+                { onclick: () => scorecard.cancelTabulation() },
+                [icon('window-close'), 'Cancel Match']
+              ) :
+              m(
+                'button#start_new_tabulation.header-block',
+                { className: 'modal-trigger', href: "#new-match-modal" },
+                [icon('plus-square'), 'Start Match']
+              )
             ) :
             m(
               'h1.scoreboard__header__title.header-block',
@@ -243,7 +192,6 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         scorer,
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
-        showCreateNewMatch: this.showCreateNewMatch.bind(this),
       }),
       m('.scoreboard__overlay', {
         className: this.focused_mission !== -1 ? ' --open' : '',
@@ -255,7 +203,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           focused_mission: this.focused_mission,
         })
       )),
-      m('.tools', [
+      !identity.isAuthenticated || (identity.isAuthenticated && scorecard.tabulation.id && !scorecard.commitForm.scoreLocked) || (identity.noWifi && !scorecard.commitForm.scoreLocked) ? m('.tools', [
         m('button.btn.btn-larger', {
           onclick() {
             if (window.confirm('Are you sure you want to start over??')) {
@@ -264,7 +212,8 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
                 missions[key] = initial[key];
               }
 
-              scorecard.reset();
+              scorecard.resetScore();
+              window.scrollTo({top: 0, behavior: 'smooth'});
             }
           },
         }, [
@@ -272,7 +221,7 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
           ' ',
           trans(texts.strings.reset),
         ]),
-      ]),
+      ]) : null,
     ]);
   }
 }

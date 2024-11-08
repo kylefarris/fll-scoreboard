@@ -1,5 +1,7 @@
 import * as m from 'mithril';
 import { config } from '../global';
+import type { SwalOptions } from 'sweetalert/typings/modules/options';
+import type { ButtonList, ButtonOptions } from 'sweetalert/typings/modules/options/buttons';
 
 declare const swal: (options: object) => void;
 
@@ -56,14 +58,22 @@ export default class GamedayModel {
      * @param {string|RequestError|Error} err - The error to handle
      */
     handleErrors(err: string | RequestError | Error): void {
+        let errorTitle: string = null;
+
         // For network/API errors
         if (err instanceof Error && 'code' in err) {
+            if (err.response.title) {
+                errorTitle = err.response.title;
+            }
+
             switch (err.code) {
                 case 401:
+                    if (errorTitle === null) errorTitle = 'Not Authenticated';
                     this.reset();
                     break;
                 case 403:
-                    this.errorMsg = `403 - ${err.response.title}: ${err.response.detail}`;
+                    if (errorTitle === null) errorTitle = 'Access Denied';
+                    this.errorMsg = err.response.detail;
                     break;
                 default:
                     break;
@@ -79,17 +89,16 @@ export default class GamedayModel {
 
         // If we have an error message, show it in our pop-up
         if (this.errorMsg) {
-            swal({
+            const errorConfig: Partial<SwalOptions> = {
                 text: this.errorMsg,
                 icon: 'error',
-                button: {
-                    text: 'OK',
-                    value: true,
-                    visible: true,
-                    className: "ok-btn",
-                    closeModal: true,
-                  }
-            });
+                dangerMode: true,
+                buttons: {
+                    confirm: true,
+                },
+            };
+            if (errorTitle) errorConfig.title = errorTitle;
+            swal(errorConfig);
         }
     }
 

@@ -1,4 +1,5 @@
 import * as m from 'mithril';
+import { NumericHashReader } from '../utils/NumericHashReader';
 import { config, years } from '../global';
 import GamedayModel from './GamedayModel';
 import identity from './Identity';
@@ -97,6 +98,7 @@ export interface Tabulation {
     Table: Table,
     matchId: string
     score: number,
+    gpScore: number,
     scoreApproved: boolean,
     teamMemberInitials: string,
     teamNumber: number,
@@ -134,10 +136,28 @@ class Scorecard extends GamedayModel {
     public eventTeamId: string;
     public matchId: string;
     public tableId: string;
+    public refereeId: string;
 
     constructor() {
         super();
         this.reset();
+    }
+
+    /**
+     * Determines the gracious professionalism key from the list of missions.
+     */
+    public getGpKey(): string {
+        return Object.keys(this.commitForm.missions).find(v => /professionalism$/.test(v));
+    }
+
+    /**
+     * Allows a referee to cancel working on a specific tabulation for whatever reason.
+     * Progress of the tabulation 
+     */
+    public cancelTabulation(): void {
+        if (window.confirm('Are you sure you want to cancel this match? You can continue where you left off by restarting it later.')) {
+            this.reset();
+        }
     }
 
     /**
@@ -181,7 +201,7 @@ class Scorecard extends GamedayModel {
         
         try {
             // Set the Gracious Professionalism score
-            const gpKey = Object.keys(this.commitForm.missions).find(v => /professionalism$/.test(v));
+            const gpKey = this.getGpKey();
             if (gpKey) this.commitForm.gpScore = this.commitForm.missions[gpKey];
 
             // Store local backup of the tabulation
@@ -220,6 +240,7 @@ class Scorecard extends GamedayModel {
                 url: `${config.apiBaseUrl}/${this.tabulation.id}/commit`,
                 body: this.commitForm,
                 responseType: 'json',
+                withCredentials: true,
                 extract: (xhr) => xhr.response,
             });
 
@@ -256,12 +277,18 @@ class Scorecard extends GamedayModel {
      * @param {string} eventTeamId - ID of the event team to create new scorecard for
      * @param {string} matchId - ID of the match to create scorecard for
      * @param {string} tableId - ID of the table the match is being held at
+     * @param {string} refereeId - ID of the referee doing the scoring
      */
-    public async init(eventTeamId: string, matchId: string, tableId: string) {
+    public async init(eventTeamId: string, matchId: string, tableId: string, refereeId: string) {
         try {
+            if (!eventTeamId) throw new Error('No team selected!');
+            if (!matchId) throw new Error('No match selected!');
+            if (!tableId) throw new Error('No table selected!');
+            if (!refereeId) throw new Error("It doesn't look like you are a valid and active referee for this event!");
+
             const result: Tabulation = await m.request({
                 method: 'GET',
-                url:`${config.apiBaseUrl}/tabulation/new/${eventTeamId}/${matchId}/${tableId}`,
+                url:`${config.apiBaseUrl}/tabulation/new/${eventTeamId}/${matchId}/${tableId}/${refereeId}`,
                 responseType: 'json',
                 withCredentials: true,
             });
@@ -272,6 +299,7 @@ class Scorecard extends GamedayModel {
                 this.eventTeamId = eventTeamId;
                 this.matchId = matchId;
                 this.tableId = tableId;
+                this.refereeId = refereeId;
 
                 this.tabulation = {
                     id: result.id,
@@ -280,6 +308,7 @@ class Scorecard extends GamedayModel {
                     Table: result.Table,
                     matchId: result.matchId,
                     score: result.score,
+                    gpScore: result.gpScore,
                     scoreApproved: result.scoreApproved,
                     teamMemberInitials: result.teamMemberInitials,
                     teamNumber: result.teamNumber,
@@ -287,12 +316,54 @@ class Scorecard extends GamedayModel {
                     createdAt: result.createdAt,
                     updatedAt: result.updatedAt,
                 };
+
+                this.commitForm = {
+                    teamMemberInitials: result.teamMemberInitials ?? '',
+                    scoreApproved: result.scoreApproved ?? false,
+                    refCode: '',
+                    score: result.score ?? 50,
+                    gpScore: result.gpScore ?? 3,
+                    missions: result.tab,
+                    scoreLocked: false,
+                }
+
+                const hashReader = new NumericHashReader(this.commitForm.missions);
+                const scoreHash = hashReader.encode(this.commitForm.missions);
+
+                location.hash = `#${scoreHash}`;
+
             } else {
                 throw new Error('Could not initialize new match.');
             }
         } catch (err) {
             this.handleErrors(err);
         }
+    }
+
+    /**
+     * A slightly-less nuclear reset option that keeps the current tabulation but
+     * resets all the scoring.
+     */
+    public resetScore() {
+        this.tabulation.scoreApproved = false;
+        this.tabulation.teamMemberInitials = null;
+        this.tabulation.teamNumber = null;
+        this.tabulation.tab = {};
+        
+        this.commitForm.teamMemberInitials = '';
+        this.commitForm.scoreApproved = false;
+        this.commitForm.refCode = '';
+        this.commitForm.score = 0;
+        this.commitForm.gpScore = 3;
+        this.commitForm.missions = {};
+        this.commitForm.scoreLocked = false;
+
+        this.committing = false;
+        this.refError = null;
+        this.teamError = null;
+        this.errorMsg = null;
+
+        this.saveProgress();
     }
 
     /**
@@ -312,6 +383,7 @@ class Scorecard extends GamedayModel {
             Table: null,
             matchId: null,
             score: 0,
+            gpScore: 3,
             scoreApproved: false,
             teamMemberInitials: null,
             teamNumber: null,
@@ -323,7 +395,7 @@ class Scorecard extends GamedayModel {
             teamMemberInitials: '',
             scoreApproved: false,
             refCode: '',
-            score: null,
+            score: 0,
             gpScore: 3,
             missions: {},
             scoreLocked: false,
@@ -346,6 +418,7 @@ class Scorecard extends GamedayModel {
                 method: 'POST',
                 url: `${config.apiBaseUrl}/tabulation/verify-ref-code`,
                 body: { refCode: this.commitForm.refCode.toUpperCase() },
+                withCredentials: true,
             });
 
             if (result?.valid === true) {
@@ -359,6 +432,28 @@ class Scorecard extends GamedayModel {
             this.handleErrors(err);
             return false;
         }
+    }
+
+    /**
+     * Saves any progress with the tabulation to the server & LocalStorage without
+     * actually officially submitting the final tabulation.
+     */
+    public async saveProgress(): Promise<void> {
+        const data = {
+            tab: this.commitForm.missions,
+            score: this.commitForm.score,
+            gpScore: 3,
+        };
+        
+        const gpKey = this.getGpKey();
+        if (gpKey) data.gpScore = this.commitForm.missions[gpKey];
+
+        await m.request({
+            method: 'PATCH',
+            url: `${config.apiBaseUrl}/tabulation/${this.tabulation.id}`,
+            body: data,
+            withCredentials: true,
+        });
     }
 
     /**

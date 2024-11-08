@@ -35,7 +35,7 @@ export default class BackupTabulationsPage implements m.ClassComponent {
         m('ul.backups-list', backups.map(v => {
           try {
             const tab = JSON.parse(localStorage[v]);
-            const gpKey = Object.keys(tab.commitForm.missions).find(v => /professionalism$/.test(v));
+            const gpKey = scorecard.getGpKey();
             const gpScore = tab.commitForm.missions[gpKey];
 
             const hashReader = new NumericHashReader(tab.commitForm.missions);
