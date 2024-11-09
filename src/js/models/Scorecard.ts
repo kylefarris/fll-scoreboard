@@ -252,7 +252,7 @@ class Scorecard extends GamedayModel {
             // Send tabulation to the server
             const result: Tabulation = await m.request({
                 method: 'POST',
-                url: `${config.apiBaseUrl}/${this.tabulation.id}/commit`,
+                url: `${config.apiBaseUrl}/tabulation/${this.tabulation.id}/commit`,
                 body: this.commitForm,
                 responseType: 'json',
                 withCredentials: true,
@@ -475,7 +475,7 @@ class Scorecard extends GamedayModel {
             // Have the API verify its validity
             const result: RefValidationResult = await m.request({
                 method: 'POST',
-                url: `${config.apiBaseUrl}/tabulation/verify-ref-code`,
+                url: `${config.apiBaseUrl}/tabulation/${this.tabulation.id}/verify-ref-code`,
                 body: { refCode: this.commitForm.refCode.toUpperCase() },
                 withCredentials: true,
             });
@@ -530,7 +530,7 @@ class Scorecard extends GamedayModel {
                 const refCode = prompt('Provide your referee code to unlock scoring:');
 
                 // If it matches the format of a valid referee code
-                if (/^[A-Z0-9]{6}$/i.test(refCode.trim())) {
+                if (/^[A-Z0-9]{6}$/i.test(refCode?.trim() ?? '')) {
                     this.commitForm.refCode = refCode.toUpperCase().trim();
 
                     // Verify that the referee code is valid for the logged in user
@@ -540,7 +540,7 @@ class Scorecard extends GamedayModel {
                     } else {
                         this.handleErrors('Referee code does not match');
                     }
-                } else {
+                } else if (refCode) {
                     this.handleErrors('Invalid referee code provided! Should be 6 letters and numbers.');
                 }
             }
