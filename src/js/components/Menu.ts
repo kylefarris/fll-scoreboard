@@ -41,7 +41,7 @@ export default class Menu implements m.ClassComponent {
           { className: 'logout-btn'},
           [
             m('a', {
-              href: 'http://localhost:5420/logout',
+              href: `${config.apiBaseUrl}/logout`,
               className: 'waves-effect',
             }, [
               'Logout',
