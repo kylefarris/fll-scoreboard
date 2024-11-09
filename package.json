@@ -14,7 +14,8 @@
         "hot": "NODE_ENV=development npx mix watch --hot",
         "production": "mix --production",
         "serve": "python3 -m http.server -d ./site 4000",
-        "test": "./node_modules/.bin/karma start karma.conf.js --single-run"
+        "test": "./node_modules/.bin/karma start karma.conf.js --single-run",
+        "push:dev": "aws s3 sync --profile gameday_key_set --exclude='.DS_Store' site/ s3://calc.fllgameday.com"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.10",
