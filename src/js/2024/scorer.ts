@@ -44,6 +44,7 @@ interface MissionObject2024 extends MissionObject {
   m15_chest?: boolean
   m15_latch?: boolean
   m16_precision_tokens?: number
+  m17_gracious_professionalism?: number
 }
 
 export class FllScorer extends AbstractScorer<MissionObject2024, Warnings2024> {
@@ -81,6 +82,7 @@ export class FllScorer extends AbstractScorer<MissionObject2024, Warnings2024> {
       m15_chest: false,
       m15_latch: false,
       m16_precision_tokens: 6,
+      m17_gracious_professionalism: 3,
     };
   }
 

@@ -128,9 +128,33 @@ form {
     display: flex;
     flex-direction: column;
 
+    form {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    input[type=text],
+    input[type=number] {
+        font-size: 1.1rem;
+        height: 50px;
+        min-width: 185px;
+        padding-left: 15px;
+        background-color: white;
+        width: 100%;
+    }
+
+    label {
+        color: white;
+    }
+
     button {
         background: #0a3f15;
         border: 1px solid #052709;
+        margin-top: 1.5rem;
 
         &:hover {
             background-color: #46b858;
@@ -149,9 +173,33 @@ form {
     display: flex;
     flex-direction: column;
 
+    form {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    input[type=text],
+    input[type=number] {
+        font-size: 1.1rem;
+        height: 50px;
+        min-width: 185px;
+        padding-left: 15px;
+        background-color: white;
+        width: 100%;
+    }
+
+    label {
+        color: white;
+    }
+
     button {
         background: #102758;
         border: 1px solid black;
+        margin-top: 1.5rem;
 
         &:hover {
             background-color: #003dbd;
