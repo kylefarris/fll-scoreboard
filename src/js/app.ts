@@ -7,11 +7,11 @@ import Layout from './components/Layout';
 import identity from './models/Identity';
 import scorecard from './models/Scorecard';
 
-declare global {
-  interface Window { identity: typeof identity }
-}
+// declare global {
+//   interface Window { identity: typeof identity }
+// }
 
-window.identity = identity;
+// window.identity = identity;
 // window.scorecard = scorecard;
 
 require('materialize-css');
