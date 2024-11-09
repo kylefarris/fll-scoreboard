@@ -111,31 +111,36 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
               [m('em', 'FLL Gameday'), ' Calculator']
             )
         ),
-        m('.overlay-nav', {
-          className: this.focused_mission !== -1 ? ' active' : '',
-        }, [
-          m('button.header-block.nav-prev.waves-effect', {
-            onclick: () => {
-              this.focusMission('prev');
-            },
-          }, [icon('chevron-left'), ' ', trans(texts.strings.prev)]),
-          m('button.header-block.nav-next.waves-effect', {
-            onclick: () => {
-              this.focusMission('next');
-            },
-          }, [trans(texts.strings.next), ' ', icon('chevron-right')]),
-          m('button.header-block.nav-close.waves-effect', {
-            onclick: () => {
-              this.focusMission('close');
-            },
-          }, [trans(texts.strings.close), ' ', icon('close')]),
-        ]),
-        m('button.header-block.start-overlay', {
-          className: this.focused_mission === -1 ? ' active' : '',
-          onclick: () => {
-            this.focusMission(0);
-          },
-        }, [icon('magic'), ' ', trans(texts.strings.launch_wizard)]),
+        (identity.authChecked && (!identity.isAuthenticated || (identity.isAuthenticated && scorecard.tabulation.id !== null)) || identity.noWifi) ?
+          m('.overlay-nav', {
+            className: this.focused_mission !== -1 ? ' active' : '',
+          }, [
+            m('button.header-block.nav-prev.waves-effect', {
+              onclick: () => {
+                this.focusMission('prev');
+              },
+            }, [icon('chevron-left'), ' ', trans(texts.strings.prev)]),
+            m('button.header-block.nav-next.waves-effect', {
+              onclick: () => {
+                this.focusMission('next');
+              },
+            }, [trans(texts.strings.next), ' ', icon('chevron-right')]),
+            m('button.header-block.nav-close.waves-effect', {
+              onclick: () => {
+                this.focusMission('close');
+              },
+            }, [trans(texts.strings.close), ' ', icon('close')]),
+          ]) : null,
+        (identity.authChecked && (!identity.isAuthenticated || (identity.isAuthenticated && scorecard.tabulation.id !== null)) || identity.noWifi) ?
+          (
+            m('button.header-block.start-overlay', {
+              className: this.focused_mission === -1 ? ' active' : '',
+              onclick: () => {
+                this.focusMission(0);
+              },
+            }, [icon('magic'), ' ', trans(texts.strings.launch_wizard)])
+          ) :
+          null,
       ]),
       m('.scoreboard__warnings', output.warnings.map(
         warning => {
@@ -193,16 +198,17 @@ export default class Scoreboard implements m.ClassComponent<ScoreboardAttrs> {
         focused_mission: this.focused_mission,
         focusMission: this.focusMission.bind(this),
       }),
-      m('.scoreboard__overlay', {
-        className: this.focused_mission !== -1 ? ' --open' : '',
-      }, data.missions.map(
-        (mission, key) => m(OverlayMission, {
-          mission,
-          key,
-          missions,
-          focused_mission: this.focused_mission,
-        })
-      )),
+      (identity.authChecked && (!identity.isAuthenticated || (identity.isAuthenticated && scorecard.tabulation.id !== null)) || identity.noWifi) ?
+        m('.scoreboard__overlay', {
+          className: this.focused_mission !== -1 ? ' --open' : '',
+        }, data.missions.map(
+          (mission, key) => m(OverlayMission, {
+            mission,
+            key,
+            missions,
+            focused_mission: this.focused_mission,
+          })
+        )) : null,
       !identity.isAuthenticated || (identity.isAuthenticated && scorecard.tabulation.id && !scorecard.commitForm.scoreLocked) || (identity.noWifi && !scorecard.commitForm.scoreLocked) ? m('.tools', [
         m('button.btn.btn-larger', {
           onclick() {
