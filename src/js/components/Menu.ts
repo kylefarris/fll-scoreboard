@@ -54,7 +54,7 @@ export default class Menu implements m.ClassComponent {
           { className: 'login-btn'},
           [
             m('a', {
-              href: `${config.apiBaseUrl}/login/${btoa(`http://${window.location.host}`)}`,
+              href: `${config.apiBaseUrl}/login/${btoa(`${window.location.protocol}//${window.location.host}`)}`,
               className: 'waves-effect',
             }, [
               'Login',
