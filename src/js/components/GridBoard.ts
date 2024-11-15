@@ -27,7 +27,7 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
     // or if they ARE authenticated and they have actually initialized a new tabulation.
     // Otherwise show them a message informing them of what to do.
     if (
-      identity.isAuthenticated && scorecard.tabulation.id === null
+      identity.isAuthenticated && scorecard.tabulation.id === null && !identity.noEvents && !identity.errorMsg
     ) {
       return m('div#no-match-started', [
         m('img.calcbot', {

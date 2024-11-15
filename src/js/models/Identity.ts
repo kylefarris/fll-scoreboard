@@ -196,7 +196,7 @@ class Identity extends GamedayModel {
                     if (referee?.id) {
                         this.refereeId = referee.id;
                     } else {
-                        throw new Error('You are not a referee for this event!');
+                        throw new Error('You are not a referee for this event! Find the Event Coordinator and make sure they generate your referee code!');
                     }
                 } else {
                     // Future: Show some interface for them to choose an event they are scoring at
@@ -210,7 +210,7 @@ class Identity extends GamedayModel {
     }
 
     /**
-     * Figures out how to handle errors send from the API server.
+     * Figures out how to handle errors sent from the API server.
      *
      * @param {Error} err - The error to handle
      */
@@ -221,11 +221,15 @@ class Identity extends GamedayModel {
                     this.reset();
                     break;
                 case 403:
-                    this.errorMsg = `403 - ${err.response.title}: ${err.response.detail}`;
+                    // this.errorMsg = `403 - ${err.response.title}: ${err.response.detail}`;
+                    this.errorMsg = err.response.detail;
                     break;
                 default:
+                    this.errorMsg = err.message;
                     break;
             }
+        } else {
+            this.errorMsg = err.message;
         }
 
         // If we have an error message, show it in our pop-up

@@ -7,12 +7,12 @@ import Layout from './components/Layout';
 import identity from './models/Identity';
 import scorecard from './models/Scorecard';
 
-// declare global {
-//   interface Window { identity: typeof identity }
-// }
+declare global {
+  interface Window { identity: typeof identity, scorecard: typeof scorecard }
+}
 
-// window.identity = identity;
-// window.scorecard = scorecard;
+window.identity = identity;
+window.scorecard = scorecard;
 
 require('materialize-css');
 
@@ -21,15 +21,14 @@ let lastPath = null;
 
 // Warn the user if the are refreshing/leaving the calculator when they have an
 // open/unsubmitted tabulation in progress.
-window.addEventListener('beforeunload', async (event) => {
+const beforeLeaveHandler = async (event) => {
+  // Recommended
   event.preventDefault();
+
   if (identity.isAuthenticated && scorecard.tabulation.id) {
-    if (confirm('Are you leave? You may lose un-submitted changes!')) {
-      await scorecard.saveProgress();
-      event.preventDefault();
-    }
+    await scorecard.saveProgress();
   }
-});
+};
 
 function createResolver(component, props = {}) {
   return {
@@ -68,9 +67,6 @@ const routes = {
     async oninit() {
       // Redirect to the first year automatically
       m.route.set(`/${years[0].data.meta.slug}`);
-
-      // Check for authenticated user
-      await identity.authenticate();
     },
     view() {
       return null;
@@ -82,6 +78,13 @@ const routes = {
 
 for (const year of years) {
   routes[`/${year.data.meta.slug}`] = createResolver(StandaloneScoreboard, {
+    async oninit() {
+      // Check for authenticated user
+      await identity.authenticate();
+
+      if (identity.isAuthenticated && scorecard.tabulation.id) window.addEventListener('beforeunload', beforeLeaveHandler);
+      else window.removeEventListener('beforeunload', beforeLeaveHandler);
+    },
     key: year.data.meta.slug, // Prevent Mithril re-using a scoreboard and its scorer/hasher
     ...year,
   });
