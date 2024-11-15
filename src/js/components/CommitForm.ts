@@ -82,12 +82,12 @@ export default class CommitForm implements m.ClassComponent<CommitFormAttrs> {
                                     maxlength: 3,
                                     readonly:
                                         scorecard.commitForm.scoreApproved,
-                                    oninput(e) {
-                                        scorecard.commitForm.teamMemberInitials =
-                                            e.target.value
-                                                .replace(/[^A-Z]/gi, "")
-                                                .toUpperCase();
-                                    },
+                                    // oninput(e) {
+                                    //     scorecard.commitForm.teamMemberInitials =
+                                    //         e.target.value
+                                    //             .replace(/[^A-Z]/gi, "")
+                                    //             .toUpperCase();
+                                    // },
                                     onblur(e) {
                                         scorecard.commitForm.teamMemberInitials =
                                             e.target.value.toUpperCase();
