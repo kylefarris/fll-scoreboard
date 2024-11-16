@@ -290,10 +290,11 @@ class Scorecard extends GamedayModel {
      *
      * @public
      * @async
-     * @param {string} eventTeamId - ID of gthe event Team to get get matches of
+     * @param {Event} e - ID of the event Team to get get matches of
      * @returns {Promise<MatchOption[]>} Dropdown-compatible list of matches a team can be scored on
      */
-    public async getTeamMatches(eventTeamId): Promise<MatchOption[]> {
+    public async getTeamMatches(e): Promise<MatchOption[]> {
+        const eventTeamId: string = e.target.value;
         const teamMatches: [] = await m.request({
             method: 'GET',
             url: `${config.apiBaseUrl}/tabulation/${eventTeamId}/unscored-matches`,
@@ -305,6 +306,10 @@ class Scorecard extends GamedayModel {
             id: config.matchTypesInverted[v],
             label: v
         }));
+
+        // document.getElementById('new-match-id').innerHTML = this.teamMatches.map((v, i) => {
+        //     return `<option value="${v.id}" ${i === 0 ? 'selected' : ''}>${v.label}</option>`;
+        // }).join('');
 
         return this.teamMatches;
     }
