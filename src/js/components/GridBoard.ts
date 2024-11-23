@@ -35,11 +35,23 @@ export default class GridBoard implements m.ClassComponent<GridBoardAttrs> {
           alt: 'cute robot',
           height: 235,
         }),
-        m('span', [
-          'You must ',
-          m('a', { className: 'modal-trigger', href: "#new-match-modal" }, ['start a match']),
-          ' before you can score a team!'
-        ]),
+        identity.chosenEvent ?
+          m('span', [
+            'You must ',
+            m('a', { className: 'modal-trigger', href: "#new-match-modal" }, ['start a match']),
+            ' before you can score a team!'
+          ]) :
+          m('div#event-picker', [
+            m('label', { for: 'event-chooser' }, ['Choose the event you are at:']),
+            m(
+              'select#event-chooser',
+              { onchange(e) { identity.setActiveEvent(e.target.value) } },
+              [
+                m('option', { value: '', disabled: true, selected: true }, ['Choose Event']),
+                ...identity.events.map(v => m('option', { value: v.id }, [v.name]))
+              ],
+            ),
+          ]),
       ]);
     }
 

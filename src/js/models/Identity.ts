@@ -129,6 +129,66 @@ class Identity extends GamedayModel {
     }
 
     /**
+     * Sets the active event for the logged in user.
+     *
+     * @param eventId - ID of the event to set as the active event
+     */
+    async setActiveEvent(eventId: string | null): Promise<void> {
+        if (eventId === null) this.chosenEvent = null;
+        this.chosenEvent = this.events.find(v => v.id === eventId) ?? null;
+
+        if (this.chosenEvent) {
+            Array.from(document.getElementsByClassName('year-link')).forEach((link: HTMLAnchorElement) => {
+                // Hide all season's in the menu other than the one for this session
+                const slug = link.href.split('/').pop();
+                if (identity.chosenEvent.Season.name.toLowerCase() !== slug) {
+                    link.style.display = 'none';
+                } else {
+                    link.style.display = 'block';
+                }
+
+                // If the season calculator isn't on the correct season URL already, make sure it is...
+                const seasonSlug = identity.chosenEvent.Season.name.toLowerCase();
+                if (window.location.pathname !== `/${seasonSlug}`) {
+                    m.route.set(`/${seasonSlug}`);
+                }
+            });
+
+            // And fetch all teams & tables for that event as well as the referee ID for the logged in user
+            // if that's available.
+            const [teams, tables, referee] = await Promise.all([
+                m.request<Array<EventTeam>>({
+                    method: 'GET',
+                    url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
+                    responseType: 'json',
+                    withCredentials: true,
+                }),
+                m.request<Array<Table>>({
+                    method: 'GET',
+                    url: `${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/tables`,
+                    responseType: 'json',
+                    withCredentials: true,
+                }),
+                m.request<Referee>({
+                    method: 'GET',
+                    url: `${config.apiBaseUrl}/me/referee/${this.chosenEvent.id}`,
+                    responseType: 'json',
+                    withCredentials: true,
+                })
+            ]);
+            
+            this.teams = teams;
+            this.tables = tables;
+
+            if (referee?.id) {
+                this.refereeId = referee.id;
+            } else {
+                throw new Error('You are not a referee for this event! Find the Event Coordinator and make sure they generate your referee code!');
+            }
+        }
+    }
+
+    /**
      * Get all events that the logged-in user is scheduled to referee.
      */
     async fetchEvents() {
@@ -148,58 +208,7 @@ class Identity extends GamedayModel {
                 
                 // If there is only one event in the list that occurs today, set that one as the "chosen" event
                 if (result.length === 1) {
-                    this.chosenEvent = this.events[0];
-
-                    // biome-ignore lint/complexity/noForEach: <explanation>
-                    Array.from(document.getElementsByClassName('year-link')).forEach((link: HTMLAnchorElement) => {
-                        // Hide all season's in the menu other than the one for this session
-                        const slug = link.href.split('/').pop();
-                        if (identity.chosenEvent.Season.name.toLowerCase() !== slug) {
-                            link.style.display = 'none';
-                        } else {
-                            link.style.display = 'block';
-                        }
-
-                        // If the season calculator isn't on the correct season URL already, make sure it is...
-                        const seasonSlug = identity.chosenEvent.Season.name.toLowerCase();
-                        if (window.location.pathname !== `/${seasonSlug}`) {
-                            m.route.set(`/${seasonSlug}`);
-                        }
-                    });
-
-                    // And fetch all teams & tables for that event as well as the referee ID for the logged in user
-                    // if that's available.
-                    const [teams, tables, referee] = await Promise.all([
-                        m.request<Array<EventTeam>>({
-                            method: 'GET',
-                            url:`${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/teams`,
-                            responseType: 'json',
-                            withCredentials: true,
-                        }),
-                        m.request<Array<Table>>({
-                            method: 'GET',
-                            url: `${config.apiBaseUrl}/tabulation/${this.chosenEvent.id}/tables`,
-                            responseType: 'json',
-                            withCredentials: true,
-                        }),
-                        m.request<Referee>({
-                            method: 'GET',
-                            url: `${config.apiBaseUrl}/me/referee/${this.chosenEvent.id}`,
-                            responseType: 'json',
-                            withCredentials: true,
-                        })
-                    ]);
-                    
-                    this.teams = teams;
-                    this.tables = tables;
-
-                    if (referee?.id) {
-                        this.refereeId = referee.id;
-                    } else {
-                        throw new Error('You are not a referee for this event! Find the Event Coordinator and make sure they generate your referee code!');
-                    }
-                } else {
-                    // Future: Show some interface for them to choose an event they are scoring at
+                    this.setActiveEvent(this.events[0].id);
                 }
             } else if (Array.isArray(result) && result.length === 0) {
                 this.noEvents = true;
