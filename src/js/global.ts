@@ -1,5 +1,4 @@
 import type { AbstractScorer, MissionObject, Year } from './interfaces/ChallengeYear';
-import identity from './models/Identity';
 
 const texts = {
   locales: {
@@ -100,7 +99,8 @@ const years: YearLink[] = [
 
 const { host } = window.location;
 let apiBaseUrl = 'http://localhost:5420';
-if (/calc.fllgameday.com/.test(host)) apiBaseUrl = 'https://dev-api.fllgameday.com';
+if (/^calc.fllgameday.com/.test(host)) apiBaseUrl = 'https://api.fllgameday.com';
+if (/^dev-calc.fllgameday.com/.test(host)) apiBaseUrl = 'https://dev-api.fllgameday.com';
 
 const matchTypes = {
   match1: 'Match 1',
