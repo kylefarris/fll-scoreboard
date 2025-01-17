@@ -32,7 +32,7 @@ export default class Menu implements m.ClassComponent {
       m('li.hr'),
       (
         identity.isAuthenticated ?
-          m('li', { className: 'welcome-msg' }, `Welcome ${identity.me.firstName}!`) :
+          m('li', { className: 'welcome-msg' }, `Welcome ${identity.me.firstName} ${identity.me.lastName}!`) :
           null
       ),
       (identity.isAuthenticated ? 
