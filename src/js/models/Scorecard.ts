@@ -160,18 +160,37 @@ class Scorecard extends GamedayModel {
 
     /**
      * Allows a referee to cancel working on a specific tabulation for whatever reason.
-     * Progress of the tabulation 
+     * Progress of the tabulation is saved.
      */
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    public  cancelTabulation(scorer: AbstractScorer<MissionObject, any>, missions: MissionObject): void {
-        if (window.confirm('Are you sure you want to cancel this match? You can continue where you left off by restarting it later.')) {
-            this.reset();
+    public async cancelTabulation(scorer: AbstractScorer<MissionObject, any>, missions: MissionObject): Promise<void> {
+        const refCode = window.prompt('Are you sure you want to cancel this match? All scoring progress will be lost!! This is not recoverable.\n\nProvide referee code to authorize.');
+        if (refCode) {
+            // Send tabulation to the server
+            const result: { status: number, detail: string } = await m.request({
+                method: 'DELETE',
+                url: `${config.apiBaseUrl}/tabulation/${this.tabulation.id}`,
+                body: { refCode: refCode.trim().toUpperCase() },
+                responseType: 'json',
+                withCredentials: true,
+                extract: (xhr) => xhr.response,
+            });
 
-            const initial = scorer.initialMissionsState();
-            for (const key in initial) {
-                missions[key] = initial[key];
-            }
-            // window.history.pushState('', document.title, window.location.pathname);
+            // Good to go!
+            if (result.status >= 200 && result.status < 300) {
+                this.reset();
+
+                const initial = scorer.initialMissionsState();
+                for (const key in initial) {
+                    missions[key] = initial[key];
+                }
+
+                M.toast({
+                    html: 'Tabulation cancelled successfully!',
+                    classes: 'green text-white',
+                });
+            } else {
+                this.handleErrors(result.detail);
+            }         
         }
     }
 
@@ -250,7 +269,7 @@ class Scorecard extends GamedayModel {
             }
 
             // Send tabulation to the server
-            const result: Tabulation = await m.request({
+            const result = await m.request({
                 method: 'POST',
                 url: `${config.apiBaseUrl}/tabulation/${this.tabulation.id}/commit`,
                 body: this.commitForm,
@@ -259,7 +278,17 @@ class Scorecard extends GamedayModel {
                 extract: (xhr) => xhr.response,
             });
 
-            if (result?.id === this.tabulation.id && result?.scoreApproved === true) {
+            // Some kind of error was thrown
+            if (result?.status >= 400) {
+                M.toast({
+                    html: result?.detail,
+                    classes: 'red text-white',
+                });
+                return false;
+            }
+
+            const tabulation: Tabulation = result;
+            if (tabulation?.id === this.tabulation.id && tabulation?.scoreApproved === true) {
                 // Reset the commit form
                 this.reset();
                 return true;
