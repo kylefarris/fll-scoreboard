@@ -1,4 +1,4 @@
-import {Year} from '../interfaces/ChallengeYear';
+import type { Year } from '../interfaces/ChallengeYear';
 
 const data: Year = {
   meta: {
@@ -343,7 +343,7 @@ const data: Year = {
                 en: 'The treasure chest is completely outside the kraken\'s nest',
                 fr: 'Le coffre au trésor est complètement en dehors de l\'antre du Kraken',
               },
-              handle: 'm07_activated',
+              handle: 'm07_outside',
               type: 'boolean',
               points: 20,
               images: [

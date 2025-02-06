@@ -3,8 +3,8 @@ import OverlayImageGallery from './OverlayImageGallery';
 import icon from '../helpers/icon';
 import trans from '../helpers/trans';
 import scorecard from '../models/Scorecard';
-import {texts} from '../global';
-import type {MissionObject, Option, Task} from '../interfaces/ChallengeYear';
+import { texts } from '../global';
+import type { MissionObject, Option, Task } from '../interfaces/ChallengeYear';
 
 interface OverlayOptionBooleanAttrs {
   task: Task
@@ -15,7 +15,7 @@ interface OverlayOptionBooleanAttrs {
 
 export default class OverlayOptionBoolean implements m.ClassComponent<OverlayOptionBooleanAttrs> {
   view(vnode: m.Vnode<OverlayOptionBooleanAttrs>) {
-    const {task, option, missions, controlOnly} = vnode.attrs;
+    const { task, option, missions, controlOnly } = vnode.attrs;
 
     return m('label.scoreboard__option', [
       m('input[type=checkbox]', {

@@ -1,4 +1,4 @@
-import {MissionObject} from '../interfaces/ChallengeYear';
+import type { MissionObject } from '../interfaces/ChallengeYear';
 
 /**
  * Read and prepare the value of a boolean mission
@@ -7,7 +7,7 @@ import {MissionObject} from '../interfaces/ChallengeYear';
  * @returns {boolean}
  */
 export function booleanMission<T extends MissionObject = any>(missions: T, key: keyof T): boolean {
-  return missions.hasOwnProperty(key) && !!missions[key];
+  return key in missions && !!missions[key];
 }
 
 /**
